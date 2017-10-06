@@ -42,12 +42,12 @@ const updateRoster = (req, res) => {
     Cab.findById({ _id: cabId }, (err, cab) => {
       if (err) res.status(401).json(err);
       if (!cab) return res.status(404).send("Not found");
-      
     })
   }
 };
 
 module.exports = {
   addRoster,
-  cabDetails
+  cabDetails,
+  updateRoster
 };
