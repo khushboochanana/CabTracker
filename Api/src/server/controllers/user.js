@@ -26,7 +26,20 @@ const addUser = (req, res) => {
   });
 };
 
+/**
+ * Update user
+ * @type {{me: (function()), addUser: (function())}}
+ */
+const updateUser = (req, res) => {
+  User.update(req.body, (err, user) => {
+    if (err) res.status(401).json(err);
+    if (!user) return res.status(404).send("Not found");
+    res.json(user);
+  });
+};
+
 module.exports = {
   me,
-  addUser
+  addUser,
+  updateUser,
 };
