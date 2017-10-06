@@ -11,8 +11,8 @@ var UserSchema = new Schema({
     location: Object,
     cabId:String,
     image: {
-        title: String,
-        publicId: String,
+      title: String,
+      publicId: String,
     },
     phoneNumber: String,
 });

@@ -35,9 +35,9 @@ const updateUser = (req, res) => {
   const { pushToken } = req.body;
   let updatedObj = {};
   if (pushToken) {
-      updatedObj.pushToken = pushToken;
+    updatedObj.pushToken = pushToken;
   } else {
-      updatedObj = req.body;
+    updatedObj = req.body;
   }
   User.update({ _id: id }, { $set: updatedObj } , (err, user) => {
     if (err) res.status(401).json(err);
