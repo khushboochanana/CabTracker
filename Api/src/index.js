@@ -19,6 +19,10 @@ fs.readdirSync(pathToRoutes).forEach((file) => {
     require(pathToRoutes + file)(app, require(pathToControllers + file))
 });
 
+app.get('*', (req, res) => {
+    res.send('Hello')
+});
+
 app.use((req,res) => {
     res.status(404).send({success:false, message: 'Page not found'})
 });
