@@ -1,5 +1,5 @@
 import Cab from '../models/cab';
-import User from '../models/User';
+import User from '../models/user';
 
 /**
  * Fetch cab details
