@@ -71,8 +71,8 @@ const updateRoster = (req, res) => {
   })
 };
 
-module.exports = {
+export default {
   addRoster,
   cabDetails,
-  updateRoster
+  updateRoster,
 };

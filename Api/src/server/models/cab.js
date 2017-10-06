@@ -25,4 +25,4 @@ var CabSchema = new Schema({
 });
 
 const Cab = mongoose.model('Cab', CabSchema);
-module.exports =  Cab;
+export default Cab;

@@ -46,7 +46,7 @@ const updateUser = (req, res) => {
   });
 };
 
-module.exports = {
+export default {
   me,
   addUser,
   updateUser,
