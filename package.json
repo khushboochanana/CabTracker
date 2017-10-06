@@ -8,7 +8,7 @@
     "npm": "4.2.0"
   },
   "scripts": {
-    "start": "node ./dist/index.js",
+    "start": "node ./Api/dist/index.js",
     "dev-server": "nodemon --exec babel-node - index.js",
     "test": "echo \"Error: no test specified\" && exit 11",
     "heroku-prebuild": "echo This runs before Heroku installs your dependencies.",
