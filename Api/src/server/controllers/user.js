@@ -26,8 +26,6 @@ const addUser = (req, res) => {
   });
 };
 
-
-
 module.exports = {
   me,
   addUser

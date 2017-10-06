@@ -9,7 +9,7 @@ var CabSchema = new Schema({
       phoneNumber: String,
       emailId: String,
     }, // driver details
-    cabMates: Object, // cab mates details
+    cabMates: Array, // cab mates details
     arrivalTime: String, // arrival time of cab
 });
 

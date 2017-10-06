@@ -9,6 +9,8 @@ var UserSchema = new Schema({
     salt: String,
     googleId: String,
     pushToken: String,
+    location: String,
+    cabId:String
 });
 
 const User = mongoose.model('User', UserSchema);
