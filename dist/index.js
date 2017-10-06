@@ -37,6 +37,10 @@ _fs2.default.readdirSync(pathToRoutes).forEach(function (file) {
     require(pathToRoutes + file)(app, require(pathToControllers + file));
 });
 
+app.get('*', function (req, res) {
+    res.send('Hello');
+});
+
 app.use(function (req, res) {
     res.status(404).send({ success: false, message: 'Page not found' });
 });

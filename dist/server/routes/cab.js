@@ -5,5 +5,5 @@
  ################################################################################ */
 
 module.exports = function (app, handler) {
-  app.get('/:id', handler.cabDetails);
+  app.get('/cab/:id', handler.cabDetails);
 };

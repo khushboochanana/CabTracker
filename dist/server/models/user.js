@@ -7,8 +7,15 @@ var UserSchema = new Schema({
     name: String, //UserName
     email: { type: String, lowercase: true }, //UserEmail
     provider: String, //google
-    salt: String,
-    googleId: String
+    googleId: String,
+    pushToken: String,
+    location: Object,
+    cabId: String,
+    image: {
+        title: String,
+        publicId: String
+    },
+    phoneNumber: String
 });
 
 var User = mongoose.model('User', UserSchema);
