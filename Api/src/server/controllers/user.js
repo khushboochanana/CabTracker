@@ -1,9 +1,45 @@
 import User from '../models/user';
 
+/**
+ * Get logged in user details
+ * @param req
+ * @param res
+ */
 const me = (req, res) => {
-    console.log("inside me")
+    const emailId = req.params.emailId;
+    User.findOne({ emailId }, (err, user) => {
+        if (err) res.status(401).json(err);
+        if (!user) return res.status(404).send("Not found");
+        res.json(user);
+    })
+};
+
+/**
+ * Add user
+ * @param req
+ * @param res
+ */
+const addUser = (req, res) => {
+  User.create(req.body, (err, user) => {
+      if (err) res.status(401).json(err);
+      return res.status(201).json(user);
+  });
+};
+
+/**
+ * Update user
+ * @type {{me: (function()), addUser: (function())}}
+ */
+const updateUser = (req, res) => {
+  User.update(req.body, (err, user) => {
+    if (err) res.status(401).json(err);
+    if (!user) return res.status(404).send("Not found");
+    res.json(user);
+  });
 };
 
 module.exports = {
-  me  
+  me,
+  addUser,
+  updateUser,
 };
