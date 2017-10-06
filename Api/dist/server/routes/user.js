@@ -5,5 +5,5 @@
  ################################################################################ */
 
 module.exports = function (app, handler) {
-  app.get('/user/me', handler.me);
+  app.get('/me', handler.me);
 };
