@@ -8,6 +8,7 @@ var UserSchema = new Schema({
     provider: String, //google
     salt: String,
     googleId: String,
+    pushToken: String,
 });
 
 const User = mongoose.model('User', UserSchema);
