@@ -5,6 +5,7 @@
  ################################################################################ */
 
 module.exports = function (app, handler) {
-  app.get('/user/me', handler.me);
-  app.post('/user/', handler.addUser);
+    app.post('/user', handler.addUser);
+    app.put('/user/:id', handler.addUser);
+    app.get('/user/:emailId', handler.me);
 };
