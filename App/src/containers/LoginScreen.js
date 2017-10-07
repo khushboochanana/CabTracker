@@ -24,25 +24,19 @@ class LoginScreen extends Component {
         scopes: ['profile', 'email'],
       });
       if (result.type === 'success') {
-        AsyncStorage.setItem("auth-key", "true");
+        AsyncStorage.setItem("auth-key", result);
         this.props.setDetails(result)
-        this.props.navigation.navigate("Detail");
+        this.props.navigation.navigate("UserDetailsForm");
       } else {
-        Alert.alert("Google Login Failed")
+        Alert.alert("Google Login Failed, Please try again after some time")
       }
     } catch(e) {
       return {error: true};
     }
   }
 
-  nativeLogin = async () => {
-
-  }
-
   render() {
     const {navigate} = this.props.navigation;
-   console.log(":::::::::", this.props)
-
     return (
       <View style={{flex: 1}}>
         <View style={styles.logo}>
@@ -57,13 +51,6 @@ class LoginScreen extends Component {
           <View>
             <TouchableHighlight style={styles.goggleLoginButton} onPress={this.signInWithGoogleAsync}>
               <Text style={{color: "#ffffff", fontSize: 16}}>Login with Google</Text>
-            </TouchableHighlight>
-          </View>
-        </View>
-        <View style={styles.login}>
-          <View>
-            <TouchableHighlight style={styles.nativeLoginButton} onPress={this.nativeLogin}>
-              <Text style={{color: "#ffffff", fontSize: 16}}>User Registration</Text>
             </TouchableHighlight>
           </View>
         </View>
@@ -119,10 +106,11 @@ LoginScreen.propTypes = {
 
 }
 
-const mapStateToProps = (state, ownProps) => ({
-  user: state.user,
-  navigation: state.navigation
-})
+const mapStateToProps = (state, ownProps) => {
+  return {
+    user: state.user,
+  }
+}
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
   getDetails: () => (dispatch(getDetails())),
