@@ -74,7 +74,7 @@ class LoginScreen extends Component {
           <View style={styles.logoContainer}>
             <Image
               style={{width: 150, height: 150, borderRadius: 75}}
-              source={{uri: 'https://goggle.github.io/react/img/logo_og.png'}}
+              source={{uri: 'http://res.cloudinary.com/hiuj1tri8/image/upload/v1507387195/cab_snwgzs.png'}}
             />
           </View>
         </View>
@@ -101,7 +101,6 @@ const styles = StyleSheet.create({
     height: 150,
     width: 150,
     borderRadius: 75,
-    backgroundColor: 'grey'
   },
   logo: {
     flex: 0.5,
