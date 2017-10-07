@@ -3,7 +3,8 @@ import {
     View,
     Text,
     StyleSheet,
-} from "react-native"
+} from "react-native";
+import get from 'lodash/get';
 
 import MapView from 'react-native-maps';
 
@@ -18,6 +19,7 @@ export default class Map extends Component {
                 "longitudeDelta": 1.4802477881312228
             },
             lines: [],
+            markers: [],
             watchPosition: {
                 latitude: 1.22,
                 longitude: 2.11
@@ -26,49 +28,40 @@ export default class Map extends Component {
     }
 
     componentDidMount() {
+        var mates = get(this.props, 'navigation.state.params.mates');
+        if (!mates) {
+            mates = []
+        }
+        var markers = mates.map((mate, index) => {
+            var marker = {};
+            marker.title = mate.name;
+            marker.description = mate.location.name;
+            marker.latlng = {
+                "latitude": mate.location.latitude,
+                "longitude": mate.location.longitude,
+            }
+            return marker;
+        });
+
+        console.log("markers >>>>> ", markers);
+
         navigator.geolocation.getCurrentPosition(
             (position) => {
-                console.log("position >>>>>>>>>", position);
-                var region = this.state.region;
+                var region = {...this.state.region};
                 region.latitude = position.coords.latitude;
                 region.longitude = position.coords.longitude;
-                var lines = this.state.lines;
-                lines.push({latitude: position.coords.latitude, longitude: position.coords.longitude})
-                this.setState({region, lines});
+                this.setState({region, markers});
             },
             (error) => this.setState({}),
             {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
         );
 
-        // navigator.geolocation.watchPosition(
-        //     (position) => {
-        //
-        //         console.log("watchPosition called >>>>>>>>>", position);
-        //
-        //         var watchPosition = this.state.watchPosition;
-        //         watchPosition.latitude = position.coords.latitude;
-        //         watchPosition.longitude = position.coords.longitude;
-        //
-        //         var lines = [...this.state.lines];
-        //         lines.push({latitude: position.coords.latitude, longitude: position.coords.longitude})
-        //         this.setState({watchPosition, lines})
-        //     },
-        //     (error) => this.setState({}),
-        //     {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
-        // );
-
-
     }
 
 
     onRegionChange = (region) => {
-        console.log("onRegionChange called >>>>", region);
-
-        // var lines = [...this.state.lines];
-        // lines.push({latitude: region.latitude, longitude: region.longitude})
-        // this.setState({region, lines});
-
-        this.setState({region});
+        // console.log("onRegionChange called >>>>", region);
+        // this.setState({region});
     }
 
 
@@ -80,10 +73,14 @@ export default class Map extends Component {
                          onRegionChange={this.onRegionChange}
                          showsUserLocation={true} followsUserLocation={true} showsMyLocationButton={true}>
 
-                    <MapView.Polyline
-                        coordinates={this.state.lines}
-                        strokeWidth={4}
-                    />
+                    {this.state.markers.map((marker, index) => (
+                        <MapView.Marker
+                            key={index}
+                            coordinate={marker.latlng}
+                            title={marker.title}
+                            description={marker.description}
+                        />
+                    ))}
 
                 </MapView>
                 <View style={{alignItems: "center"}}>

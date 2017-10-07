@@ -15,7 +15,7 @@ import { saveData} from '../actions/index';
 import GooglePlacesInput from './../components/Geolocation'
 import { setDetails } from '../actions/index';
 
-const SAVE_USER_ENDPOINT = 'http://10.1.12.33:9000/user';
+const SAVE_USER_ENDPOINT = 'http://10.1.2.34:9000/user';
 
 class UserDetailsForm extends Component {
   constructor(props) {

@@ -15,8 +15,9 @@ var me = function me(req, res) {
     var emailId = req.params.emailId;
 
     _user2.default.findOne({ email: emailId }, function (err, user) {
+        console.log("user.......", user, err);
         if (err) return res.status(401).json(err);
-        if (!user) return res.status(404).send("Not found");
+        if (!user) return res.status(200).json({});
         return res.json(user);
     });
 };
@@ -27,6 +28,7 @@ var me = function me(req, res) {
  * @param res
  */
 var addUser = function addUser(req, res) {
+    console.log(req.body);
     _user2.default.create(req.body, function (err, user) {
         if (err) return res.status(401).json(err);
         return res.status(201).json(user);
