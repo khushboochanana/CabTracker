@@ -14,9 +14,8 @@ import {
 
 import Expo, {Permissions, Notifications} from 'expo';
 
-const PUSH_ENDPOINT = 'https://your-server.com/users/push-token';
 
-async function registerForPushNotificationsAsync() {
+async function registerForPushNotificationsAsync(id) {
     const {status: existingStatus} = await Permissions.getAsync(
         Permissions.NOTIFICATIONS
     );
@@ -40,25 +39,26 @@ async function registerForPushNotificationsAsync() {
     let token = await Notifications.getExpoPushTokenAsync();
 
     console.log("======", token);
-    // Alert.alert("Notification Toke is >> ", token);
+    Alert.alert("Notification Toke is >> 22 ", token);
 
 
-    // POST the token to your backend server from where you can retrieve it to send push notifications.
-    // return fetch(PUSH_ENDPOINT, {
-    //     method: 'POST',
-    //     headers: {
-    //         Accept: 'application/json',
-    //         'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify({
-    //         token: {
-    //             value: token,
-    //         },
-    //         user: {
-    //             username: 'Brent',
-    //         },
-    //     }),
-    // });
+    console.log("ure >>>>> :: ", `http://127.0.0.1:9000/user/${id}`);
+     fetch(`http://127.0.0.1:9000/user/${id}`, {
+        method: 'PUT',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            pushToken: token
+        }),
+    }).then((response)=>{
+        return response.json();
+     }).then((responseData) => {
+         console.log("ResponseDate >>>>>0, ", responseData)
+     });
+
+    return token
 }
 
 export default class List extends Component {
@@ -67,8 +67,20 @@ export default class List extends Component {
         this.state = {
             notification: '',
             user: {
-                name: "Rajesh panwar",
-                email: "rajesh@tothenew.com"
+                "_id": "59d8a752e1bcadeed49b58b7",
+                "name": "Rajesh",
+                "email": "rajesh@tothenew.com",
+                "provider": "google",
+                "googleId": "123",
+                "pushToken": "",
+                "location": {
+                    "address": "",
+                    "longitude": 0,
+                    "latitude": 0
+                },
+                "cabId": "cab1",
+                "image": {},
+                "phoneNumber": 9953989490
             },
             users: [
                 {
@@ -99,7 +111,7 @@ export default class List extends Component {
 
 
     async componentDidMount() {
-        registerForPushNotificationsAsync();
+        registerForPushNotificationsAsync(this.state.user._id);
 
         this._notificationSubscription = Notifications.addListener(this._handleNotification);
 
@@ -206,8 +218,9 @@ export default class List extends Component {
                                                 </View>
                                             </View>
                                             <View style={{flex: .3, alignItems: 'center', justifyContent: 'center'}}>
-                                                <Switch accessible={false} value={item.present} onValueChange={() => {}}></Switch>
-                                               </View>
+                                                <Switch accessible={false} value={item.present} onValueChange={() => {
+                                                }}></Switch>
+                                            </View>
                                         </View>
                                     </TouchableHighlight>
                                 </View>}
