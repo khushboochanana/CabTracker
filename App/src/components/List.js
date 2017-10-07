@@ -11,6 +11,7 @@ import {
     Image,
     Switch
 } from 'react-native';
+const io = require('socket.io-client');
 
 import Expo, {Permissions, Notifications} from 'expo';
 
@@ -105,6 +106,14 @@ export default class List extends Component {
 
     }
 
+    componentWillMount() {
+        const socket = io('http://192.168.42.238:9000/socket.io/socket.io.js');
+        socket.on('connect', () => {
+            console.log('connected');
+          socket.emit('joined', { data: {cabId: 1 }});
+        })
+    }
+
     _handleNotification = (notification) => {
         console.log("==================", notification);
 
@@ -133,11 +142,12 @@ export default class List extends Component {
         }).then((responseData) => {
             console.log("ResponseDate >>>>>0, ", responseData)
         });
-    }
+        socket.emit('pickUp', { data: {cabId: 1, location: '123' }});
+    };
 
     _markAbsent = () => {
         console.log("Absent Today done");
-    }
+    };
 
     _keyExtractor = (item, index) => index;
 
@@ -176,8 +186,9 @@ export default class List extends Component {
                                 alignItems: "center",
                                 justifyContent: "center"
                             }}>
-                                <TouchableHighlight style={styles.button}
-                                                    onPress={this._pickUp}>
+                                <TouchableHighlight
+                                    style={styles.button}
+                                    onPress={this._pickUp}>
                                     <Text style={{color: "#ffff"}}> Pickup Done </Text>
                                 </TouchableHighlight>
 
