@@ -39,24 +39,30 @@ class LoginScreen extends Component {
         iosClientId: ID.ios,
         scopes: ['profile', 'email'],
       });
-      if (result.type === 'success') {
-
-        this.props.setDetails(result)
-        let responseData = await fetch(GET_USER_ENDPOINT+`/${result.user.email}`, {
-          method: 'GET',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-        }).then((response)=>{
-          return response.json();
-        })
-        if (responseData && responseData.email) {
-          alreadyExists = responseData.email
-          this.props.setDetails(responseData)
-          this.props.navigation.navigate("List");
+      if (result.type === 'success' && result.user) {
+        if ( /@tothenew.com\s*$/.test(result.user.email) ) {
+          this.props.setDetails(result)
+          let responseData = await fetch(GET_USER_ENDPOINT+`/${result.user.email}`, {
+            method: 'GET',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+            },
+          }).then((response)=>{
+            return response.json();
+          })
+          if (responseData && responseData.email) {
+            alreadyExists = responseData.email
+            this.props.setDetails(responseData)
+            this.props.navigation.navigate("List");
+          } else {
+            this.props.navigation.navigate("UserDetailsForm");
+          }
         } else {
-          this.props.navigation.navigate("UserDetailsForm");
+          this.setState({
+            loader: true
+          })
+          Alert.alert("Please Log In with tothenew mail id")
         }
       } else {
         Alert.alert("Google Login Failed, Please try again after some time")
