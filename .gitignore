@@ -4,3 +4,4 @@ node_modules
 tmp/*
 .App/.expo
 .App/node_modules
+.expo

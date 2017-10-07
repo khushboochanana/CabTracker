@@ -17,7 +17,7 @@ const stackNav = {
   List : {
     screen : List,
     navigationOptions : {
-      title : "Your Scans"
+      title : "Detail"
     }
   },
   UserDetailsForm : {
@@ -31,4 +31,4 @@ const stackNav = {
   }
 }
 
-export default StackNavigator(stackNav, {initialRouteName : "Splash" });
+export default StackNavigator(stackNav, {initialRouteName : "List" });
