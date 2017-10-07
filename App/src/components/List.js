@@ -12,36 +12,37 @@ import {
     Switch,
     AsyncStorage
 } from 'react-native';
+
 const io = require('socket.io-client');
 import get from 'lodash/get';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 
-import Expo, { Permissions, Notifications } from 'expo';
+import Expo, {Permissions, Notifications} from 'expo';
 
 async function registerForPushNotificationsAsync(id, token) {
-    const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
+    const {status: existingStatus} = await Permissions.getAsync(Permissions.NOTIFICATIONS);
     if (existingStatus === 'granted' && token) return;
-    const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+    const {status} = await Permissions.askAsync(Permissions.NOTIFICATIONS);
     if (status !== 'granted') return;
 
     // Get the token that uniquely identifies this device
     let pushToken = await Notifications.getExpoPushTokenAsync();
     if (pushToken) {
-      fetch(`http://10.1.12.33:9000/user/${id}`, {
-          method: 'PUT',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ pushToken }),
-      }).then(response => {
-          console.log("response")
-          return response.json();
-      }).then(data => {
-          console.log("ResponseDate >>>>>", data)
-      }).catch(err => {
-          console.log("Error>>>>>>>>>>>>>>>>>>>>>>>>>>>>", err);
-      });
+        fetch(`http://10.1.2.34:9000/user/${id}`, {
+            method: 'PUT',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({pushToken}),
+        }).then(response => {
+            console.log("response")
+            return response.json();
+        }).then(data => {
+            console.log("ResponseDate >>>>>", data)
+        }).catch(err => {
+            console.log("Error>>>>>>>>>>>>>>>>>>>>>>>>>>>>", err);
+        });
     }
     console.log("after push function....")
 }
@@ -49,91 +50,119 @@ async function registerForPushNotificationsAsync(id, token) {
 class List extends Component {
     constructor(props) {
         super(props);
-        this.socket = io('http://10.1.12.33:9000');
-       this.state = {
-          notification: '',
-          user: get(props, 'user.user'),
-          mates: get(props, 'cab.cabMates'),
-          cab: get(props, 'cab'),
-       }
+        this.socket = io('http://10.1.2.34:9000');
+        this.state = {
+            notification: '',
+            user: get(props, 'user.user'),
+            mates: get(props, 'cab.cabMates'),
+            cab: get(props, 'cab'),
+        }
     }
 
     async componentDidMount() {
-      const { _id, pushToken } = this.state.user;
-      registerForPushNotificationsAsync(_id, pushToken);
-      this._notificationSubscription = Notifications.addListener(this._handleNotification);
+        const {_id, pushToken} = this.state.user;
+        registerForPushNotificationsAsync(_id, pushToken);
+        this._notificationSubscription = Notifications.addListener(this._handleNotification);
     }
 
     componentWillMount() {
-      const cabId = get(this.state, 'user.cabId');
-      if (cabId) {
-        this.socket.on('connect', () => {
-          console.log('connected');
-          this.socket.emit('joined', { data: { cabId }});
-        })
-      }
+        var cabId = get(this.state, 'user.cabId');
+
+
+        // Alert.alert("Date >>> : " + JSON.stringify(this.props.user))
+        // Alert.alert("Date >>> : " + cabId);
+
+        cabId = "59d90d73734d1d18c95c8ef8";
+
+        if (cabId) {
+
+
+            fetch(`http://10.1.2.34:9000/cab/${cabId}`, {
+                method: 'GET',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                }
+            }).then(response => {
+                return response.json();
+            }).then(responseData => {
+                console.log("ResponseDate >>>>>0, ", responseData);
+
+                this.setState({mates : responseData.cabMates});
+
+            }).catch(err => {
+                console.log(err, 'Error--')
+            });
+
+            this.socket.on('connect', () => {
+                console.log('connected');
+                this.socket.emit('joined', {data: {cabId}});
+            })
+        }
     }
 
     _handleNotification = (notification) => {
-      const msg = get(notification, 'data.msg');
-      if (msg) {
-        // this.props.navigation.navigate("Detail", {id : parseInt(notification.data.id)});
-        Alert.alert('Notification : ' + msg);
-      }
+        const msg = get(notification, 'data.msg');
+        if (msg) {
+            // this.props.navigation.navigate("Detail", {id : parseInt(notification.data.id)});
+            Alert.alert('Notification : ' + msg);
+        }
     };
 
     _pickUp = () => {
-      const { cabId, location } = get(this.state, 'user');
-      if (cabId && location) {
-          fetch(`http://10.1.12.33:9000/user/${cabId}/notification`, {
-              method: 'POST',
-              headers: {
-                  Accept: 'application/json',
-                  'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                  title: "Notification",
-                  body: "Pickup Done",
-                  data: {
-                      msg: "Pickup Done"
-                  }
-              }),
-          }).then(response => {
-              return response.json();
-          }).then(data => {
-              console.log("ResponseDate >>>>>0, ", data)
-          }).catch(err => {
-              console.log(err, 'Error--')
-          });
-          this.socket.emit('pickUp', { data: { cabId, location }});
-      }
+        const {cabId, location} = get(this.state, 'user');
+        if (cabId && location) {
+            fetch(`http://10.1.2.34:9000/user/${cabId}/notification`, {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    title: "Notification",
+                    body: "Pickup Done",
+                    data: {
+                        msg: "Pickup Done"
+                    }
+                }),
+            }).then(response => {
+                return response.json();
+            }).then(data => {
+                console.log("ResponseDate >>>>>0, ", data)
+            }).catch(err => {
+                console.log(err, 'Error--')
+            });
+            this.socket.emit('pickUp', {data: {cabId, location}});
+        }
     };
 
     _markAbsent = (value) => {
-      const userId = get(this.state, 'user._id');
-      const cabId = get(this.state, 'cab.cabId');
-      if (userId && cabId) {
-        fetch(`http://10.1.12.33:9000/cab/${cabId}`, {
-            method: 'PUT',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              presence: value,
-              userId,
-            }),
-          }).then(response => {
-              return response.json();
-          }).then(data => {
-              console.log("ResponseDate >>>>>0, ", data)
-          }).catch(err => {
-              console.log(err, 'Error--')
-          });
-      }
+        const userId = get(this.state, 'user._id');
+        const cabId = get(this.state, 'cab.cabId');
+        if (userId && cabId) {
+            fetch(`http://10.1.2.34:9000/cab/${cabId}`, {
+                method: 'PUT',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    presence: value,
+                    userId,
+                }),
+            }).then(response => {
+                return response.json();
+            }).then(data => {
+                console.log("ResponseDate >>>>>0, ", data)
+            }).catch(err => {
+                console.log(err, 'Error--')
+            });
+        }
     };
 
-    _addDelay = () => {};
+    _gotoMap = () => {
+        this.props.navigation.navigate("Map", {mates : this.state.mates});
+    };
 
     _keyExtractor = (item, index) => index;
 
@@ -142,8 +171,8 @@ class List extends Component {
         this.props.navigation.navigate("LoginScreen");
     }
 
-  render() {
-      const { user, mates } = this.state;
+    render() {
+        const {user, mates} = this.state;
         return (
             <View style={{flex: 1}}>
                 <TouchableHighlight style={styles.logOutButton} onPress={this.logout}>
@@ -163,7 +192,9 @@ class List extends Component {
                             </View>
                             <Text style={styles.userName}>{user && user.name}</Text>
                             <View style={{flex: .3, alignItems: 'center', justifyContent: 'center'}}>
-                                <Switch accessible={false} value={user && user.presence} onValueChange={(value) => { this._markAbsent(value); }}></Switch>
+                                <Switch accessible={false} value={user && user.presence} onValueChange={(value) => {
+                                    this._markAbsent(value);
+                                }}></Switch>
                             </View>
                             <Text style={{fontSize: 18, fontWeight: "bold"}}>{user && user.email}</Text>
                             <View style={{
@@ -178,8 +209,8 @@ class List extends Component {
                                     <Text style={{color: "#ffff"}}> Pickup Done </Text>
                                 </TouchableHighlight>
 
-                                <TouchableHighlight style={styles.button} onPress={this._addDelay}>
-                                    <Text style={{color: "#ffff"}}> Delay </Text>
+                                <TouchableHighlight style={styles.button} onPress={this._gotoMap}>
+                                    <Text style={{color: "#ffff"}}> Map </Text>
                                 </TouchableHighlight>
                             </View>
                         </View>
@@ -193,8 +224,10 @@ class List extends Component {
                             <FlatList
                                 data={mates}
                                 keyExtractor={this._keyExtractor}
-                                renderItem={({item, index}) => <View style={{borderBottomWidth: 1, borderColor: "#ddd"}} key={index}>
-                                    <TouchableHighlight style={{flex: 1}} onPress={() => navigate("Detail", {id: item && item.id})}>
+                                renderItem={({item, index}) => <View style={{borderBottomWidth: 1, borderColor: "#ddd"}}
+                                                                     key={index}>
+                                    <TouchableHighlight style={{flex: 1}}
+                                                        onPress={() => navigate("Detail", {id: item && item.id})}>
                                         <View style={{flex: 1, flexDirection: "row"}}>
                                             <View style={{flex: .7, flexWrap: 'wrap'}}>
                                                 <View style={styles.content}>
@@ -347,9 +380,9 @@ const styles = StyleSheet.create({
 
 
 const mapStateToProps = (state) => {
-  return {
-    user: state.user,
-  }
+    return {
+        user: state.user,
+    }
 }
 
 export default connect(mapStateToProps)(List)
