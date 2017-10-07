@@ -67,11 +67,11 @@ const notification = (req, res) => {
             }
             var options = {
                 url: "https://exp.host/--/api/v2/push/send",
-                method : "POST",
+                method: "POST",
                 headers: {
-                    'content-type' : 'application/json',
+                    'content-type': 'application/json',
                 },
-                body:  JSON.stringify({
+                body: JSON.stringify({
                     "to": user.pushToken,
                     "title": req.body.title,
                     "body": req.body.body,
