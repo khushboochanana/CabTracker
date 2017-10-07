@@ -18,8 +18,7 @@ app.use(bodyParser.json());
 const pathToRoutes = path.resolve(__dirname, './server/routes') + "/";
 const pathToControllers = path.resolve(__dirname, './server/controllers') + "/";
 
-mongoose.connect('mongodb://vibhor:qwerty123@ds119151.mlab.com:19151/run');
-// mongoose.connect('mongodb://127.0.0.1:27017/apptest');
+mongoose.connect('mongodb://heroku_k2pz1bq2:ta7ni3luchib79d4mo8d4hbv71@ds113505.mlab.com:13505/heroku_k2pz1bq2');
 
 fs.readdirSync(pathToRoutes).forEach((file) => {
     require(pathToRoutes + file)(app, require(pathToControllers + file))
