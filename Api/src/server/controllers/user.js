@@ -49,8 +49,48 @@ const updateUser = (req, res) => {
     });
 };
 
+const notification = (req, res) => {
+    const {cabId} = req.params;
+    if (!cabId || !req.body.title || !req.body.body) {
+        return res.status(404).json("CabId not found");
+    }
+    User.find({cabId}, (err, users) => {
+        if (err)
+            return res.status(401).json(err);
+
+        if (!users || !users.length)
+            return res.status(404).send("Not found");
+
+        users.forEach((user) => {
+            if (!user.pushToken) {
+                return;
+            }
+            var options = {
+                url: "https://exp.host/--/api/v2/push/send",
+                method : "POST",
+                headers: {
+                    'content-type' : 'application/json',
+                },
+                body:  JSON.stringify({
+                    "to": user.pushToken,
+                    "title": req.body.title,
+                    "body": req.body.body,
+                    "data": req.body.data
+                })
+            }
+            require('request')(options, function (err, response, body) {
+                console.log("========", body)
+            })
+        })
+
+        res.send(200)
+
+    })
+}
+
 module.exports = {
     me,
     addUser,
     updateUser,
+    notification
 };
