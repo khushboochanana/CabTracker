@@ -9,7 +9,7 @@ const me = (req, res) => {
     const { emailId } = req.params;
     User.findOne({email: emailId}, (err, user) => {
         if (err) return res.status(401).json(err);
-        if (!user) return res.status(404).send("Not found");
+        if (!user) return res.status(200).json({});
         return res.json(user);
     })
 };

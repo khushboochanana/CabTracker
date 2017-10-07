@@ -60,21 +60,22 @@ var updateRoster = function updateRoster(req, res) {
       presence = _req$body.presence,
       arrivalTime = _req$body.arrivalTime,
       driver = _req$body.driver,
-      name = _req$body.name;
+      name = _req$body.name,
+      cabMates = _req$body.cabMates;
 
   var updatedObj = {};
   _cab2.default.findById({ _id: id }).lean().exec(function (err, cab) {
     if (err) return res.status(401).json(err);
     if (!cab) return res.status(404).send("Not found");
     if (presence && userId) {
-      var cabMates = cab.cabMates;
-      var mateIndex = cabMates.findIndex(function (cabMate) {
+      var _cabMates = cab.cabMates;
+      var mateIndex = _cabMates.findIndex(function (cabMate) {
         return cabMate.id === userId;
       });
       if (mateIndex !== -1) {
-        cabMates[mateIndex] = _extends({}, cabMates[mateIndex], { presence: presence });
+        _cabMates[mateIndex] = _extends({}, _cabMates[mateIndex], { presence: presence });
       }
-      updatedObj.cabMates = cabMates;
+      updatedObj.cabMates = _cabMates;
     }
     if (arrivalTime) {
       updatedObj.arrivalTime = arrivalTime;
@@ -84,6 +85,9 @@ var updateRoster = function updateRoster(req, res) {
     }
     if (name) {
       updatedObj.name = name;
+    }
+    if (cabMates) {
+      updatedObj.cabMates = cabMates;
     }
     _cab2.default.update({ _id: id }, { $set: updatedObj }, function (err, cab) {
       if (err) return res.status(401).json(err);

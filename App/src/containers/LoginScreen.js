@@ -18,7 +18,7 @@ const ID = {
   "ios": "6981964509-g8nd0e1ejvjs8qrtoomdcev9r9cmupvo.apps.googleusercontent.com"
 }
 
-const GET_USER_ENDPOINT = 'http://10.1.12.33:9000/user';
+const GET_USER_ENDPOINT = 'http://10.1.20.149:9000/user';
 
 class LoginScreen extends Component {
   constructor(props) {
@@ -40,6 +40,7 @@ class LoginScreen extends Component {
         scopes: ['profile', 'email'],
       });
       if (result.type === 'success') {
+
         this.props.setDetails(result)
         let responseData = await fetch(GET_USER_ENDPOINT+`/${result.user.email}`, {
           method: 'GET',
@@ -50,7 +51,6 @@ class LoginScreen extends Component {
         }).then((response)=>{
           return response.json();
         })
-
         if (responseData && responseData.email) {
           alreadyExists = responseData.email
           this.props.setDetails(responseData)
@@ -69,6 +69,10 @@ class LoginScreen extends Component {
   render() {
     const {navigate} = this.props.navigation;
     return (
+    <Image
+      style={styles.backgroundImage}
+      source={{uri: 'http://res.cloudinary.com/hiuj1tri8/image/upload/v1507405497/taxi-background_wh5tqt.jpg'}}
+    >
       <View style={{flex: 1}}>
         <View style={styles.logo}>
           <View style={styles.logoContainer}>
@@ -79,7 +83,7 @@ class LoginScreen extends Component {
           </View>
         </View>
         <View style={styles.login}>
-          { this.state.loader ?
+          {this.state.loader ?
             <View>
               <TouchableHighlight style={styles.goggleLoginButton} onPress={this.signInWithGoogleAsync}>
                 <Text style={{color: "#ffffff", fontSize: 16}}>Login with Google</Text>
@@ -92,6 +96,7 @@ class LoginScreen extends Component {
           }
         </View>
       </View>
+    </Image>
     )
   }
 }
@@ -110,7 +115,7 @@ const styles = StyleSheet.create({
   login: {
     flex: 0.5,
     alignItems: 'center',
-    justifyContent: 'center'
+    marginTop: 30,
   },
   goggleLoginButton: {
     paddingLeft: 60,
@@ -131,7 +136,13 @@ const styles = StyleSheet.create({
   skipStep: {
     marginTop: 40,
     padding: 8
-  }
+  },
+  backgroundImage: {
+    flex: 1,
+    height: window.height,
+    width: window.width,
+    flexDirection: 'column'
+  },
 })
 
 const mapStateToProps = (state, ownProps) => {
