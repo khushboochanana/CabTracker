@@ -13,7 +13,7 @@ const stackNav = {
   List : {
     screen : List,
     navigationOptions : {
-      title : "Your Scans"
+      title : "Detail"
     }
   },
   Detail : {
