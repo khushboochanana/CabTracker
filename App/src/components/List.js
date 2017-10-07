@@ -25,7 +25,7 @@ async function registerForPushNotificationsAsync(id, token) {
     // Get the token that uniquely identifies this device
     let pushToken = await Notifications.getExpoPushTokenAsync();
     if (pushToken) {
-      fetch(`http://10.1.2.34:9000/user/${id}`, {
+      fetch(`http://10.1.20.149:9000/user/${id}`, {
           method: 'PUT',
           headers: {
             Accept: 'application/json',
@@ -33,11 +33,12 @@ async function registerForPushNotificationsAsync(id, token) {
           },
           body: JSON.stringify({ pushToken }),
       }).then(response => {
+          console.log("response")
           return response.json();
       }).then(data => {
           console.log("ResponseDate >>>>>", data)
       }).catch(err => {
-          console.log("Error", err);
+          console.log("Error>>>>>>>>>>>>>>>>>>>>>>>>>>>>", err);
       });
     }
 }
@@ -81,33 +82,35 @@ export default class List extends Component {
 
     _pickUp = () => {
       const { cabId, location } = get(this.state, 'user');
-      fetch(`http://10.1.2.34:9000/user/${cabId}/notification`, {
-        method: 'POST',
-        headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-            body: JSON.stringify({
-              title: "Notification",
-              body: "Pickup Done",
-              data: {
-                msg: "Pickup Done here"
-            }
-          }),
-        }).then(response => {
-            return response.json();
-        }).then(data => {
-            console.log("ResponseDate >>>>>0, ", data)
-        }).catch(err => {
-            console.log(err, 'Error--')
-        });
-        this.socket.emit('pickUp', { data: { cabId, location }});
+      if (cabId && location) {
+          fetch(`http://10.1.2.34:9000/user/${cabId}/notification`, {
+              method: 'POST',
+              headers: {
+                  Accept: 'application/json',
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                  title: "Notification",
+                  body: "Pickup Done",
+                  data: {
+                      msg: "Pickup Done"
+                  }
+              }),
+          }).then(response => {
+              return response.json();
+          }).then(data => {
+              console.log("ResponseDate >>>>>0, ", data)
+          }).catch(err => {
+              console.log(err, 'Error--')
+          });
+          this.socket.emit('pickUp', { data: { cabId, location }});
+      }
     };
 
     _markAbsent = (value) => {
-      const { _id } = this.state.user;
-      const { cabId } = this.state.cab;
-      if (_id && cabId) {
+      const userId = get(this.state, 'user._id');
+      const cabId = get(this.state, 'cab.cabId');
+      if (userId && cabId) {
         fetch(`http://10.1.2.34:9000/cab/${cabId}`, {
             method: 'PUT',
             headers: {
@@ -116,7 +119,7 @@ export default class List extends Component {
             },
             body: JSON.stringify({
               presence: value,
-              userId: _id,  
+              userId,
             }),
           }).then(response => {
               return response.json();
@@ -147,11 +150,11 @@ export default class List extends Component {
                                     />
                                 </View>
                             </View>
-                            <Text style={styles.userName}>{user.name}</Text>
+                            <Text style={styles.userName}>{user && user.name}</Text>
                             <View style={{flex: .3, alignItems: 'center', justifyContent: 'center'}}>
-                                <Switch accessible={false} value={user.presence} onValueChange={(value) => { this._markAbsent(value); }}></Switch>
+                                <Switch accessible={false} value={user && user.presence} onValueChange={(value) => { this._markAbsent(value); }}></Switch>
                             </View>
-                            <Text style={{fontSize: 18, fontWeight: "bold"}}>{user.email}</Text>
+                            <Text style={{fontSize: 18, fontWeight: "bold"}}>{user && user.email}</Text>
                             <View style={{
                                 flex: .5,
                                 flexDirection: "row",
@@ -180,12 +183,12 @@ export default class List extends Component {
                                 data={mates}
                                 keyExtractor={this._keyExtractor}
                                 renderItem={({item, index}) => <View style={{borderBottomWidth: 1, borderColor: "#ddd"}} key={index}>
-                                    <TouchableHighlight style={{flex: 1}} onPress={() => navigate("Detail", {id: item.id})}>
+                                    <TouchableHighlight style={{flex: 1}} onPress={() => navigate("Detail", {id: item && item.id})}>
                                         <View style={{flex: 1, flexDirection: "row"}}>
                                             <View style={{flex: .7, flexWrap: 'wrap'}}>
                                                 <View style={styles.content}>
-                                                    <View><Text style={styles.title}>{item.name}</Text></View>
-                                                    <View><Text>{item.email}</Text></View>
+                                                    <View><Text style={styles.title}>{item && item.name}</Text></View>
+                                                    <View><Text>{item && item.email}</Text></View>
                                                 </View>
                                             </View>
                                         </View>
