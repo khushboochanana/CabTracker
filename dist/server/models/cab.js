@@ -1,5 +1,8 @@
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
@@ -22,8 +25,7 @@ var CabSchema = new Schema({
         presence: { type: Boolean, default: true },
         phoneNumber: String
     }], // cab mates details
-    arrivalTime: String // arrival time of cab
-});
+    arrivalTime: String });
 
 var Cab = mongoose.model('Cab', CabSchema);
-module.exports = Cab;
+exports.default = Cab;

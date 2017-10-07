@@ -31,7 +31,7 @@ app.use(_bodyParser2.default.json());
 var pathToRoutes = _path2.default.resolve(__dirname, './server/routes') + "/";
 var pathToControllers = _path2.default.resolve(__dirname, './server/controllers') + "/";
 
-_mongoose2.default.connect('mongodb://vibhor:qwerty123@ds119151.mlab.com:19151/run');
+_mongoose2.default.connect('mongodb://heroku_k2pz1bq2:ta7ni3luchib79d4mo8d4hbv71@ds113505.mlab.com:13505/heroku_k2pz1bq2');
 
 _fs2.default.readdirSync(pathToRoutes).forEach(function (file) {
     require(pathToRoutes + file)(app, require(pathToControllers + file));

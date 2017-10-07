@@ -14,7 +14,11 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var me = function me(req, res) {
   var emailId = req.params.emailId;
 
-  _user2.default.findOne({ emailId: emailId }, function (err, user) {
+  console.log("123123", emailId);
+
+  _user2.default.find({ email: emailId }, function (err, user) {
+
+    console.log("123123", err, user);
     if (err) return res.status(401).json(err);
     if (!user) return res.status(404).send("Not found");
     return res.json(user);
@@ -27,7 +31,9 @@ var me = function me(req, res) {
  * @param res
  */
 var addUser = function addUser(req, res) {
+  console.log("1", req.body);
   _user2.default.create(req.body, function (err, user) {
+    console.log("2", err, user);
     if (err) return res.status(401).json(err);
     return res.status(201).json(user);
   });

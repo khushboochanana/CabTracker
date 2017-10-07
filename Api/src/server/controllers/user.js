@@ -7,7 +7,7 @@ import User from '../models/user';
  */
 const me = (req, res) => {
   const { emailId } = req.params;
-  User.findOne({ emailId }, (err, user) => {
+  User.find({ email: emailId }, (err, user) => {
     if (err) return res.status(401).json(err);
     if (!user) return res.status(404).send("Not found");
     return res.json(user);
