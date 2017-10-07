@@ -9,7 +9,8 @@ import {
     ScrollView,
     FlatList,
     Image,
-    Switch
+    Switch,
+    AsyncStorage
 } from 'react-native';
 
 import Expo, {Permissions, Notifications} from 'expo';
@@ -129,11 +130,17 @@ export default class List extends Component {
 
     _keyExtractor = (item, index) => index;
 
-    render() {
+    logout = () => {
+        AsyncStorage.removeItem("auth-key")
+        this.props.navigation.navigate("LoginScreen");
+    }
+
+  render() {
         return (
             <View style={{flex: 1}}>
-                {/*<Text>Hello World</Text>*/}
-
+                <TouchableHighlight style={styles.logOutButton} onPress={this.logout}>
+                    <Text style={{color: "#ffffff", fontSize: 16}}>Logout</Text>
+                </TouchableHighlight>
 
                 <ScrollView>
                     <View style={{flex: 1}}>

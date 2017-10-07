@@ -11,10 +11,10 @@ export default class SplashScreen extends Component {
     super(props);
   }
 
-  setTimePassed = () => {
-    let loggedIn = AsyncStorage.getItem("auth-key")
+  setTimePassed = async () => {
+    let loggedIn = await AsyncStorage.getItem("auth-key")
     if (loggedIn) {
-      this.props.navigation.navigate("UserDetailsForm");
+      this.props.navigation.navigate("List");
     } else {
       this.props.navigation.navigate("LoginScreen");
     }
