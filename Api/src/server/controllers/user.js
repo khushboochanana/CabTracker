@@ -6,12 +6,12 @@ import User from '../models/user';
  * @param res
  */
 const me = (req, res) => {
-    const emailId = req.params.emailId;
-    User.findOne({ emailId }, (err, user) => {
-        if (err) res.status(401).json(err);
-        if (!user) return res.status(404).send("Not found");
-        res.json(user);
-    })
+  const { emailId } = req.params;
+  User.findOne({ emailId }, (err, user) => {
+    if (err) return res.status(401).json(err);
+    if (!user) return res.status(404).send("Not found");
+    return res.json(user);
+  })
 };
 
 /**
@@ -21,8 +21,8 @@ const me = (req, res) => {
  */
 const addUser = (req, res) => {
   User.create(req.body, (err, user) => {
-      if (err) res.status(401).json(err);
-      return res.status(201).json(user);
+    if (err) return res.status(401).json(err);
+    return res.status(201).json(user);
   });
 };
 
@@ -31,14 +31,22 @@ const addUser = (req, res) => {
  * @type {{me: (function()), addUser: (function())}}
  */
 const updateUser = (req, res) => {
-  User.update(req.body, (err, user) => {
+  const { id } = req.params;
+  const { pushToken } = req.body;
+  let updatedObj = {};
+  if (pushToken) {
+    updatedObj.pushToken = pushToken;
+  } else {
+    updatedObj = req.body;
+  }
+  User.update({ _id: id }, { $set: updatedObj } , (err, user) => {
     if (err) res.status(401).json(err);
     if (!user) return res.status(404).send("Not found");
     res.json(user);
   });
 };
 
-module.exports = {
+export default {
   me,
   addUser,
   updateUser,

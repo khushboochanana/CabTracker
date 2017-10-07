@@ -11,11 +11,11 @@ var UserSchema = new Schema({
     location: Object,
     cabId:String,
     image: {
-        title: String,
-        publicId: String,
+      title: String,
+      publicId: String,
     },
     phoneNumber: String,
 });
 
 const User = mongoose.model('User', UserSchema);
-module.exports =  User;
+export default User;

@@ -13,10 +13,11 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 var me = function me(req, res) {
   var emailId = req.params.emailId;
+
   _user2.default.findOne({ emailId: emailId }, function (err, user) {
-    if (err) res.status(401).json(err);
+    if (err) return res.status(401).json(err);
     if (!user) return res.status(404).send("Not found");
-    res.json(user);
+    return res.json(user);
   });
 };
 
@@ -27,7 +28,7 @@ var me = function me(req, res) {
  */
 var addUser = function addUser(req, res) {
   _user2.default.create(req.body, function (err, user) {
-    if (err) res.status(401).json(err);
+    if (err) return res.status(401).json(err);
     return res.status(201).json(user);
   });
 };
@@ -37,7 +38,16 @@ var addUser = function addUser(req, res) {
  * @type {{me: (function()), addUser: (function())}}
  */
 var updateUser = function updateUser(req, res) {
-  _user2.default.update(req.body, function (err, user) {
+  var id = req.params.id;
+  var pushToken = req.body.pushToken;
+
+  var updatedObj = {};
+  if (pushToken) {
+    updatedObj.pushToken = pushToken;
+  } else {
+    updatedObj = req.body;
+  }
+  _user2.default.update({ _id: id }, { $set: updatedObj }, function (err, user) {
     if (err) res.status(401).json(err);
     if (!user) return res.status(404).send("Not found");
     res.json(user);

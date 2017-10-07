@@ -1,3 +1,5 @@
+import { findIndex } from 'lodash/findIndex';
+
 import Cab from '../models/cab';
 import User from '../models/user';
 
@@ -7,11 +9,11 @@ import User from '../models/user';
  * @param res
  */
 const cabDetails = (req, res) => {
-  const cabId = req.params.id;
-  Cab.findById({ _id: cabId }, (err, cab) => {
-    if (err) res.status(401).json(err);
+  const { id }= req.params;
+  Cab.findById({ _id: id }, (err, cab) => {
+    if (err) return res.status(401).json(err);
     if (!cab) return res.status(404).send("Not found");
-    res.json(cab);
+    return res.json(cab);
   });  
 };
 
@@ -22,12 +24,14 @@ const cabDetails = (req, res) => {
  */
 const addRoster = (req, res) => {
   Cab.create(req.body, (err, cab) => {
-    if (err) res.status(401).json(err);
+    if (err) return res.status(401).json(err);
     let ids = [];
     cab.cabMates.forEach(cabMate => { ids.push(cabMate._id) });
-    User.update({ _id: { $in:ids } },{ $set: { cabId: cab._id } });
-      return res.status(201).json(user);
+    User.update({ _id: { $in: ids } },{ $set: { cabId: cab._id } }, (err, user) => {
+      if (err) return res.status(401).json(err);
+      return res.status(201).json(cab);
     });
+  });
 };
 
 /**
@@ -36,18 +40,39 @@ const addRoster = (req, res) => {
  * @param res
  */
 const updateRoster = (req, res) => {
-  const { cabId } = req.params;
-  const { userId, presence } = req.query;  
-  if (presence && userId) {
-    Cab.findById({ _id: cabId }, (err, cab) => {
-      if (err) res.status(401).json(err);
+  const { id } = req.params;
+  const { userId, presence, arrivalTime, driver, name } = req.body;
+  let updatedObj = {};
+  Cab.findById({ _id: id }).lean().exec((err, cab) => {
+    if (err) return res.status(401).json(err);
+    if (!cab) return res.status(404).send("Not found");
+    if (presence && userId) {
+      const cabMates = cab.cabMates;
+      const mateIndex = cabMates.findIndex(cabMate => cabMate.id === userId);
+      if (mateIndex !== -1) {
+        cabMates[mateIndex] = { ... cabMates[mateIndex], presence };
+      }
+      updatedObj.cabMates = cabMates;
+    }
+    if (arrivalTime) {
+      updatedObj.arrivalTime = arrivalTime;
+    }
+    if (driver) {
+      updatedObj.driver = driver;
+    }
+    if (name) {
+      updatedObj.name = name;
+    }
+    Cab.update({ _id: id }, { $set: updatedObj }, (err, cab) => {
+      if (err) return res.status(401).json(err);
       if (!cab) return res.status(404).send("Not found");
+      return res.status(201).json(cab);
     })
-  }
+  })
 };
 
-module.exports = {
+export default {
   addRoster,
   cabDetails,
-  updateRoster
+  updateRoster,
 };
