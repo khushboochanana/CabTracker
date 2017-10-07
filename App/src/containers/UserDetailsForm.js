@@ -9,6 +9,7 @@ import {
   TextInput
 } from "react-native"
 import { connect } from 'react-redux';
+import GooglePlacesInput from './../components/Geolocation'
 
 class UserDetailsForm extends Component {
   constructor(props) {
@@ -53,6 +54,7 @@ class UserDetailsForm extends Component {
         <Text>{this.state.data.user.email}</Text>
         <View>
           <Text>Location: </Text>
+         <GooglePlacesInput />
           <TextInput
             style={{height: 40, borderColor: 'gray', borderWidth: 1}}
             onChangeText={(location) => this.setState({location})}
