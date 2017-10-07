@@ -9,7 +9,8 @@ import {
     ScrollView,
     FlatList,
     Image,
-    Switch
+    Switch,
+    AsyncStorage
 } from 'react-native';
 const io = require('socket.io-client');
 import get from 'lodash/get';
@@ -135,10 +136,19 @@ export default class List extends Component {
 
     _keyExtractor = (item, index) => index;
 
-    render() {
-        const { user, mates } = this.state;
+    logout = () => {
+        AsyncStorage.removeItem("auth-key")
+        this.props.navigation.navigate("LoginScreen");
+    }
+
+  render() {
+      const { user, mates } = this.state;
         return (
             <View style={{flex: 1}}>
+                <TouchableHighlight style={styles.logOutButton} onPress={this.logout}>
+                    <Text style={{color: "#ffffff", fontSize: 16}}>Logout</Text>
+                </TouchableHighlight>
+
                 <ScrollView>
                     <View style={{flex: 1}}>
                         <View style={styles.base}>

@@ -8,7 +8,6 @@ import {
   TouchableHighlight,
   Image,
   ScrollView,
-  AsyncStorage
 } from "react-native";
 import Expo from 'expo';
 
@@ -19,9 +18,12 @@ const ID = {
   "ios": "6981964509-g8nd0e1ejvjs8qrtoomdcev9r9cmupvo.apps.googleusercontent.com"
 }
 
+const GET_USER_ENDPOINT = 'http://10.1.12.33:9000/user';
+
 class LoginScreen extends Component {
 
   signInWithGoogleAsync = async () => {
+    let alreadyExists
     try {
       const result = await Expo.Google.logInAsync({
         androidClientId: ID.android,
@@ -29,9 +31,24 @@ class LoginScreen extends Component {
         scopes: ['profile', 'email'],
       });
       if (result.type === 'success') {
-        AsyncStorage.setItem("auth-key", JSON.stringify(result));
         this.props.setDetails(result)
-        this.props.navigation.navigate("UserDetailsForm");
+        let responseData = await fetch(GET_USER_ENDPOINT+`/${result.user.email}`, {
+          method: 'GET',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+        }).then((response)=>{
+          return response.json();
+        })
+
+        if (responseData && responseData[0] && responseData[0].email) {
+          alreadyExists = responseData[0].email
+          this.props.setDetails(responseData[0])
+          this.props.navigation.navigate("List");
+        } else {
+          this.props.navigation.navigate("UserDetailsForm");
+        }
       } else {
         Alert.alert("Google Login Failed, Please try again after some time")
       }

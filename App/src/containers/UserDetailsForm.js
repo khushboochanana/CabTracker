@@ -6,10 +6,16 @@ import {
   TouchableHighlight,
   AsyncStorage,
   Image,
-  TextInput
+  TextInput,
+  ScrollView,
 } from "react-native"
 import { connect } from 'react-redux';
+
+import { saveData} from '../actions/index';
 import GooglePlacesInput from './../components/Geolocation'
+import { setDetails } from '../actions/index';
+
+const SAVE_USER_ENDPOINT = 'http://10.1.12.33:9000/user';
 
 class UserDetailsForm extends Component {
   constructor(props) {
@@ -38,25 +44,55 @@ class UserDetailsForm extends Component {
     this.props.navigation.navigate("LoginScreen");
   }
 
+  location = (data, details) => {
+    this.setState({
+      location: {
+        address: details.formatted_address,
+        latlng: details.geometry.location
+      }
+    })
+  }
+
   save = () => {
-     this.props.saveData()
+    const userData = {
+      email: this.state.data.user.email,
+      name: this.state.data.user.name,
+      image: this.state.data.user.photoUrl,
+      location: {
+        latitude: this.state.location.latlng.lat,
+        longitude: this.state.location.latlng.lng,
+        name: this.state.location.address
+      },
+      phoneNumber: this.state.phoneNumber,
+    }
+
+    fetch(SAVE_USER_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userData),
+    }).then((response)=>{
+      return response.json();
+    }).then((responseData) => {
+      AsyncStorage.setItem("auth-key", JSON.stringify(responseData));
+      this.props.setDetails(responseData)
+      this.props.navigation.navigate("List");
+    });
   }
 
   render () {
-
     const userForm = this.state.data && this.state.data.user ? (
-      <View>
+      <View style={{flex: 1}}>
         <Image
           style={{width: 150, height: 150, borderRadius: 75}}
           source={{uri: this.state.data.user.photoUrl}}
         />
         <Text>{this.state.data.user.name}</Text>
         <Text>{this.state.data.user.email}</Text>
-        <View>
-          <Text>Location: </Text>
-          <GooglePlacesInput />
-
-        </View>
+        <Text>Location: </Text>
+        <GooglePlacesInput setLocation={this.location}/>
         <View>
           <Text>Phone number: </Text>
           <TextInput
@@ -75,12 +111,12 @@ class UserDetailsForm extends Component {
     )
 
     return (
-      <View style={styles.container}>
+      <ScrollView style={styles.container}>
         <TouchableHighlight style={styles.logOutButton} onPress={this.logout}>
           <Text style={{color: "#ffffff", fontSize: 16}}>Logout</Text>
         </TouchableHighlight>
         {userForm}
-      </View>
+      </ScrollView>
     )
   }
 }
@@ -104,7 +140,7 @@ const mapStateToProps = (state, ownProps) => {
 }
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
-  saveData: () => (dispatch(saveData())),
+  setDetails: (value) => dispatch(setDetails(value)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(UserDetailsForm)
