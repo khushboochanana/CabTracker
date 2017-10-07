@@ -10,10 +10,7 @@ var UserSchema = new Schema({
     pushToken: String,
     location: Object,
     cabId:String,
-    image: {
-      title: String,
-      publicId: String,
-    },
+    image: String,
     phoneNumber: String,
 });
 
