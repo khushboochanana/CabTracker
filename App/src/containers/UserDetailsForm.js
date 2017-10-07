@@ -43,20 +43,16 @@ class UserDetailsForm extends Component {
   }
 
   render () {
-
     const userForm = this.state.data && this.state.data.user ? (
-      <View>
+      <View style={{flex: 1}}>
         <Image
           style={{width: 150, height: 150, borderRadius: 75}}
           source={{uri: this.state.data.user.photoUrl}}
         />
         <Text>{this.state.data.user.name}</Text>
         <Text>{this.state.data.user.email}</Text>
-        <View>
-          <Text>Location: </Text>
-          <GooglePlacesInput />
-
-        </View>
+        <Text>Location: </Text>
+        <GooglePlacesInput />
         <View>
           <Text>Phone number: </Text>
           <TextInput
