@@ -5,18 +5,22 @@ import LoginScreen from "./LoginScreen";
 import UserDetailsForm from "./UserDetailsForm";
 import List from "../components/List"
 import Map from "../components/Map"
+import SplashScreen from "./SplashScreen"
 
 const stackNav = {
-  Home : {
+  Splash : {
+    screen : SplashScreen
+  },
+  LoginScreen : {
     screen : LoginScreen
   },
   List : {
     screen : List,
     navigationOptions : {
-      title : "Your Scans"
+      title : "Detail"
     }
   },
-  Detail : {
+  UserDetailsForm : {
     screen : UserDetailsForm,
     navigationOptions : {
       title : "Select Items"
@@ -27,4 +31,4 @@ const stackNav = {
   }
 }
 
-export default StackNavigator(stackNav, {initialRouteName : "Home" });
+export default StackNavigator(stackNav, {initialRouteName : "Splash" });
