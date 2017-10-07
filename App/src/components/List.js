@@ -133,22 +133,24 @@ class List extends Component {
       }
     };
 
-    _addDelay = () => {};
-
     _keyExtractor = (item, index) => index;
 
     logout = () => {
-        AsyncStorage.removeItem("auth-key")
+        AsyncStorage.removeItem("auth-key");
         this.props.navigation.navigate("LoginScreen");
-    }
+    };
 
   render() {
       const { user, mates } = this.state;
         return (
-            <View style={{flex: 1}}>
+            <View style={{flex: 1, backgroundColor: '#fff'}}>
+              <View>
                 <TouchableHighlight style={styles.logOutButton} onPress={this.logout}>
-                    <Text style={{color: "#ffffff", fontSize: 16}}>Logout</Text>
+                  <Text style={{color: "#ffffff", fontSize: 16}}>
+                    Logout
+                  </Text>
                 </TouchableHighlight>
+              </View>
 
                 <ScrollView>
                     <View style={{flex: 1}}>
@@ -162,15 +164,16 @@ class List extends Component {
                                 </View>
                             </View>
                             <Text style={styles.userName}>{user && user.name}</Text>
-                            <View style={{flex: .3, alignItems: 'center', justifyContent: 'center'}}>
-                                <Switch accessible={false} value={user && user.presence} onValueChange={(value) => { this._markAbsent(value); }}></Switch>
-                            </View>
                             <Text style={{fontSize: 18, fontWeight: "bold"}}>{user && user.email}</Text>
+                          <View style={{flex: .3, alignItems: 'center', justifyContent: 'center', marginTop: 10}}>
+                            <Switch accessible={false} value={user && user.presence} onValueChange={(value) => { this._markAbsent(value); }}></Switch>
+                          </View>
                             <View style={{
-                                flex: .5,
+                                flex: 1,
                                 flexDirection: "row",
                                 alignItems: "center",
-                                justifyContent: "center"
+                                justifyContent: "center",
+                                marginTop: 20,
                             }}>
                                 <TouchableHighlight
                                     style={styles.button}
@@ -178,13 +181,11 @@ class List extends Component {
                                     <Text style={{color: "#ffff"}}> Pickup Done </Text>
                                 </TouchableHighlight>
 
-                                <TouchableHighlight style={styles.button} onPress={this._addDelay}>
+                                <TouchableHighlight style={[styles.button, styles.background]} onPress={this._addDelay}>
                                     <Text style={{color: "#ffff"}}> Delay </Text>
                                 </TouchableHighlight>
                             </View>
                         </View>
-
-                        <View style={{margin: 5, borderBottomWidth: 2, width: "100%"}}></View>
 
                         <View style={{flex: .7}}>
                             <View style={{padding: 5, alignItems: "center", justifyContent: "center"}}>
@@ -285,16 +286,22 @@ const styles = StyleSheet.create({
     logo: {
         flex: 0.5,
         alignItems: 'center',
-        justifyContent: 'flex-end'
+        justifyContent: 'flex-end',
+        marginBottom: 10,
+        marginTop: 30,
     },
     container: {
         flex: 1
     },
     button: {
-        padding: 12,
-        margin: 5,
-        borderRadius: 25,
-        backgroundColor: "grey"
+      padding: 12,
+      width: "50%",
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: '#fba800',
+    },
+    background: {
+      backgroundColor: 'black',
     },
     scanbtn: {
         position: "absolute",
@@ -342,6 +349,19 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: "bold",
         marginBottom: 5
+    },
+    logOutButton: {
+      padding: 10,
+      borderRadius: 5,
+      backgroundColor: '#CD5C5C',
+      width: 100,
+      marginTop: 15,
+      display: 'flex',
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+      position: 'absolute',
+      right: 10,
+      top: 0,
     }
 });
 

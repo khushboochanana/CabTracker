@@ -112,9 +112,11 @@ class UserDetailsForm extends Component {
 
     return (
       <ScrollView style={styles.container}>
-        <TouchableHighlight style={styles.logOutButton} onPress={this.logout}>
-          <Text style={{color: "#ffffff", fontSize: 16}}>Logout</Text>
-        </TouchableHighlight>
+        <View>
+          <TouchableHighlight style={styles.logOutButton} onPress={this.logout}>
+            <Text style={{color: "#ffffff", fontSize: 16}}>Logout</Text>
+          </TouchableHighlight>
+        </View>
         {userForm}
       </ScrollView>
     )
@@ -126,7 +128,12 @@ const styles = StyleSheet.create({
     flex: 1
   },
   logOutButton: {
-
+    paddingLeft: 60,
+    paddingRight: 60,
+    borderRadius: 5,
+    paddingTop: 15,
+    paddingBottom: 15,
+    backgroundColor: '#CD5C5C'
   },
   saveButton: {
 
