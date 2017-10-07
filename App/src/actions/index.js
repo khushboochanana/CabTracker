@@ -6,10 +6,10 @@ export const getDetails = () => (
   }
 )
 
-export const setDetails = (value) => (
-  {
+export const setDetails = (value) => {
+  return {
     type: SETDETAILS,
     value: value
   }
-)
+}
 

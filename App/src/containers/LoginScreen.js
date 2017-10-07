@@ -14,17 +14,22 @@ import Expo from 'expo';
 
 import { getDetails, setDetails } from '../actions/index';
 
+const ID = {
+  "android": "6981964509-icr06um0k71sv2g9uelefk9jnkf51k01.apps.googleusercontent.com",
+  "ios": "6981964509-g8nd0e1ejvjs8qrtoomdcev9r9cmupvo.apps.googleusercontent.com"
+}
+
 class LoginScreen extends Component {
 
   signInWithGoogleAsync = async () => {
     try {
       const result = await Expo.Google.logInAsync({
-        androidClientId: "6981964509-icr06um0k71sv2g9uelefk9jnkf51k01.apps.googleusercontent.com",
-        iosClientId: "6981964509-g8nd0e1ejvjs8qrtoomdcev9r9cmupvo.apps.googleusercontent.com",
+        androidClientId: ID.android,
+        iosClientId: ID.ios,
         scopes: ['profile', 'email'],
       });
       if (result.type === 'success') {
-        AsyncStorage.setItem("auth-key", result);
+        AsyncStorage.setItem("auth-key", JSON.stringify(result));
         this.props.setDetails(result)
         this.props.navigation.navigate("UserDetailsForm");
       } else {
