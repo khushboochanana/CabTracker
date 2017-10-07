@@ -1,17 +1,22 @@
 import socketio from 'socket.io';
-import Cab from '../src/server/models/cab';
 
 export default (server) => {
     const io  = socketio(server);
 
-    io.on('connection', (socket)=> {
-      socket.on('joined', (data) => {
-        const { cabId } = data;
+    io.on('connection', (socket) => {
+        console.log('connected');
+
+        socket.on('joined', (data) => {
+            console.log('joined');
+
+            const { cabId } = data;
         socket.join(cabId);
       });
         
       socket.on('pickUp', (data) => {
-        const { location, cabId } = data;
+          console.log('pickUp');
+
+          const { location, cabId } = data;
         socket.to(cabId).emit('updateLocation', location );
       })
       
