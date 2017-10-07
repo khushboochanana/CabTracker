@@ -69,17 +69,21 @@ class LoginScreen extends Component {
   render() {
     const {navigate} = this.props.navigation;
     return (
+    <Image
+      style={styles.backgroundImage}
+      source={{uri: 'http://res.cloudinary.com/hiuj1tri8/image/upload/v1507405497/taxi-background_wh5tqt.jpg'}}
+    >
       <View style={{flex: 1}}>
         <View style={styles.logo}>
           <View style={styles.logoContainer}>
             <Image
               style={{width: 150, height: 150, borderRadius: 75}}
-              source={{uri: 'https://goggle.github.io/react/img/logo_og.png'}}
+              source={{uri: 'http://res.cloudinary.com/hiuj1tri8/image/upload/v1507387195/cab_snwgzs.png'}}
             />
           </View>
         </View>
         <View style={styles.login}>
-          { this.state.loader ?
+          {this.state.loader ?
             <View>
               <TouchableHighlight style={styles.goggleLoginButton} onPress={this.signInWithGoogleAsync}>
                 <Text style={{color: "#ffffff", fontSize: 16}}>Login with Google</Text>
@@ -92,6 +96,7 @@ class LoginScreen extends Component {
           }
         </View>
       </View>
+    </Image>
     )
   }
 }
@@ -101,7 +106,6 @@ const styles = StyleSheet.create({
     height: 150,
     width: 150,
     borderRadius: 75,
-    backgroundColor: 'grey'
   },
   logo: {
     flex: 0.5,
@@ -111,7 +115,7 @@ const styles = StyleSheet.create({
   login: {
     flex: 0.5,
     alignItems: 'center',
-    justifyContent: 'center'
+    marginTop: 30,
   },
   goggleLoginButton: {
     paddingLeft: 60,
@@ -132,7 +136,13 @@ const styles = StyleSheet.create({
   skipStep: {
     marginTop: 40,
     padding: 8
-  }
+  },
+  backgroundImage: {
+    flex: 1,
+    height: window.height,
+    width: window.width,
+    flexDirection: 'column'
+  },
 })
 
 const mapStateToProps = (state, ownProps) => {
