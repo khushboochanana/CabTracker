@@ -1,7 +1,7 @@
 import socketio from 'socket.io';
 
 export default (server) => {
-    const io  = socketio(server);
+    const io = socketio(server);
 
     io.on('connection', (socket) => {
         console.log('connected');
@@ -9,16 +9,16 @@ export default (server) => {
         socket.on('joined', (data) => {
             console.log('joined');
 
-            const { cabId } = data;
-        socket.join(cabId);
-      });
-        
-      socket.on('pickUp', (data) => {
-          console.log('pickUp');
+            const {cabId} = data;
+            socket.join(cabId);
+        });
 
-          const { location, cabId } = data;
-        socket.to(cabId).emit('updateLocation', location );
-      })
-      
+        socket.on('pickUp', (data) => {
+            console.log('pickUp', data);
+
+            const {location, cabId} = data;
+            socket.to(cabId).emit('updateLocation', location);
+        })
+
     });
 }
