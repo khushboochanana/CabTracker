@@ -16,7 +16,7 @@ const workPlace = {
 export default class GooglePlacesInput extends Component {
   render() {
     return (
-      <View style={{ paddingTop: Constants.statusBarHeight, flex: 1 }}>
+      <View style={{flex: 1}}>
         <GooglePlacesAutocomplete
           placeholder="Search"
           minLength={2} // minimum length of text to search
@@ -27,7 +27,7 @@ export default class GooglePlacesInput extends Component {
           renderDescription={row => row.description} // custom description render
           onPress={(data, details = null) => {
             // 'details' is provided when fetchDetails = true
-            console.log(data);
+            console.log("datfahcasjhdc",data);
             console.log(details);
           }}
           getDefaultValue={() => {
