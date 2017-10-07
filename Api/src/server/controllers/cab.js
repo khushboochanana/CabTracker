@@ -9,7 +9,7 @@ import User from '../models/user';
  * @param res
  */
 const cabDetails = (req, res) => {
-  const { id }= req.params;
+  const { id } = req.params;
   Cab.findById({ _id: id }, (err, cab) => {
     if (err) return res.status(401).json(err);
     if (!cab) return res.status(404).send("Not found");
