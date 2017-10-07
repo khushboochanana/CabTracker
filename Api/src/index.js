@@ -3,10 +3,13 @@ import path from 'path';
 import fs from 'fs';
 import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
+import http from 'http'
+import socket from './socket.js'
 
 const port = process.env.PORT || 9000;
 const app = express();
-
+const server  =http.Server(app);
+socket(server)
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
     
@@ -27,6 +30,7 @@ app.use((req,res) => {
     res.status(404).send({success:false, message: 'Page not found'})
 });
 
-app.listen(port, () => {
+
+server.listen(port, () => {
     console.log(`-- Server running on port ${port} --`);
 });

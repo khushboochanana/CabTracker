@@ -20,11 +20,20 @@ var _bodyParser = require('body-parser');
 
 var _bodyParser2 = _interopRequireDefault(_bodyParser);
 
+var _http = require('http');
+
+var _http2 = _interopRequireDefault(_http);
+
+var _socket = require('./socket.js');
+
+var _socket2 = _interopRequireDefault(_socket);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var port = process.env.PORT || 9000;
 var app = (0, _express2.default)();
-
+var server = _http2.default.Server(app);
+(0, _socket2.default)(server);
 app.use(_bodyParser2.default.urlencoded({ extended: true }));
 app.use(_bodyParser2.default.json());
 
@@ -45,6 +54,6 @@ app.use(function (req, res) {
     res.status(404).send({ success: false, message: 'Page not found' });
 });
 
-app.listen(port, function () {
+server.listen(port, function () {
     console.log('-- Server running on port ' + port + ' --');
 });
