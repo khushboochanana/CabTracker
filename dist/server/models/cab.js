@@ -25,7 +25,8 @@ var CabSchema = new Schema({
         presence: { type: Boolean, default: true },
         phoneNumber: String
     }], // cab mates details
-    arrivalTime: String });
+    arrivalTime: String // arrival time of cab
+});
 
 var Cab = mongoose.model('Cab', CabSchema);
 exports.default = Cab;
