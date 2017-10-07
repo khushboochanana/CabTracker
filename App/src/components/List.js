@@ -53,6 +53,8 @@ async function registerForPushNotificationsAsync(id, pushToken) {
 export default class List extends Component {
     constructor(props) {
         super(props);
+        this.socket = io('http://10.1.2.34:9000');
+
         this.state = {
             notification: '',
             user: {
@@ -107,10 +109,9 @@ export default class List extends Component {
     }
 
     componentWillMount() {
-        const socket = io('http://192.168.42.238:9000/socket.io/socket.io.js');
-        socket.on('connect', () => {
+        this.socket.on('connect', () => {
             console.log('connected');
-          socket.emit('joined', { data: {cabId: 1 }});
+            this.socket.emit('joined', { data: {cabId: 1 }});
         })
     }
 
@@ -142,7 +143,7 @@ export default class List extends Component {
         }).then((responseData) => {
             console.log("ResponseDate >>>>>0, ", responseData)
         });
-        socket.emit('pickUp', { data: {cabId: 1, location: '123' }});
+        this.socket.emit('pickUp', { data: {cabId: 1, location: '123' }});
     };
 
     _markAbsent = () => {
