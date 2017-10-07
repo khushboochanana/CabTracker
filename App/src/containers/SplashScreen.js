@@ -24,7 +24,7 @@ export default class SplashScreen extends Component {
   componentWillMount() {
     setTimeout(() => {
       this.setTimePassed();
-    },150000);
+    },1500);
   }
 
   render() {
