@@ -12,159 +12,133 @@ import {
     Switch
 } from 'react-native';
 const io = require('socket.io-client');
+import get from 'lodash/get';
 
-import Expo, {Permissions, Notifications} from 'expo';
+import Expo, { Permissions, Notifications } from 'expo';
 
+async function registerForPushNotificationsAsync(id, token) {
+    const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
+    if (existingStatus === 'granted' && token) return;
+    const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+    if (status !== 'granted') return;
 
-async function registerForPushNotificationsAsync(id, pushToken) {
-    const {status: existingStatus} = await Permissions.getAsync(
-        Permissions.NOTIFICATIONS
-    );
-    let finalStatus = existingStatus;
-
-    if (existingStatus === 'granted' && pushToken) {
-        return;
-    }
-    const {status} = await Permissions.askAsync(Permissions.NOTIFICATIONS);
-    finalStatus = status;
-    if (finalStatus !== 'granted') {
-        return;
-    }
     // Get the token that uniquely identifies this device
-    let token = await Notifications.getExpoPushTokenAsync();
-    fetch(`http://10.1.2.34:9000/user/${id}`, {
-        method: 'PUT',
-        headers: {
+    let pushToken = await Notifications.getExpoPushTokenAsync();
+    if (pushToken) {
+      fetch(`http://10.1.2.34:9000/user/${id}`, {
+          method: 'PUT',
+          headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            pushToken: token
-        }),
-    }).then((response) => {
-        return response.json();
-    }).then((responseData) => {
-        console.log("ResponseDate >>>>>0, ", responseData)
-    });
-
-    return
+          },
+          body: JSON.stringify({ pushToken }),
+      }).then(response => {
+          return response.json();
+      }).then(data => {
+          console.log("ResponseDate >>>>>", data)
+      }).catch(err => {
+          console.log("Error", err);
+      });
+    }
 }
 
 export default class List extends Component {
     constructor(props) {
         super(props);
+        this.socket = io('http://192.168.42.238:9000');
         this.state = {
-            notification: '',
-            user: {
-                "_id": "59d8b8905a02b0d59858caf2",
-                "name": "Rajesh",
-                "email": "rajesh@tothenew.com",
-                "provider": "google",
-                "googleId": "123",
-                "pushToken": "dffsfsdfsa",
-                "location": {
-                    "address": "",
-                    "longitude": 0,
-                    "latitude": 0
-                },
-                "cabId": "cab1",
-                "image": {},
-                "phoneNumber": 9953989490
-            },
-            users: [
-                {
-                    name: "Rajesh panwar",
-                    email: "rajesh@tothenew.com",
-                    present: true
-                },
-                {
-                    name: "Rajesh panwar 1",
-                    email: "rajesh@tothenew.com",
-                    present: true
-                },
-                {
-                    name: "Rajesh panwar 2",
-                    email: "rajesh@tothenew.com",
-                    present: false
-                },
-                {
-                    name: "Rajesh panwar 3",
-                    email: "rajesh@tothenew.com",
-                    present: true
-                },
-            ]
-
+          notification: '',
+          user: props && props.user,
+          mates: get(props, 'cab.cabMates'),
+          cab: get(props, 'cab'),
         }
-
     }
 
-
     async componentDidMount() {
-        registerForPushNotificationsAsync(this.state.user._id, this.state.user.pushToken);
-
-        this._notificationSubscription = Notifications.addListener(this._handleNotification);
-
+      const { _id, pushToken } = this.state.user;
+      registerForPushNotificationsAsync(_id, pushToken);
+      this._notificationSubscription = Notifications.addListener(this._handleNotification);
     }
 
     componentWillMount() {
-        const socket = io('http://192.168.42.238:9000/socket.io/socket.io.js');
-        socket.on('connect', () => {
-            console.log('connected');
-          socket.emit('joined', { data: {cabId: 1 }});
+      const cabId = get(this.state, 'user.cabId');
+      if (cabId) {
+        this.socket.on('connect', () => {
+          console.log('connected');
+          this.socket.emit('joined', { data: { cabId }});
         })
+      }
     }
 
     _handleNotification = (notification) => {
-        console.log("==================", notification);
-
-        if (notification && notification.data && notification.data.msg) {
-            // this.props.navigation.navigate("Detail", {id : parseInt(notification.data.id)});
-            Alert.alert('Notification : ' + notification.data.msg);
-        }
+      console.log("==================", notification);
+      const msg = get(notification, 'data.msg');
+      if (msg) {
+        // this.props.navigation.navigate("Detail", {id : parseInt(notification.data.id)});
+        Alert.alert('Notification : ' + msg);
+      }
     };
 
     _pickUp = () => {
-        fetch(`http://10.1.2.34:9000/user/${this.state.user.cabId}/notification`, {
-            method: 'POST',
+      const { cabId, location } = get(this.state, 'user');
+      fetch(`http://10.1.2.34:9000/user/${cabId}/notification`, {
+        method: 'POST',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+            body: JSON.stringify({
+              title: "Notification",
+              body: "Pickup Done",
+              data: {
+                msg: "Pickup Done here"
+            }
+          }),
+        }).then(response => {
+            return response.json();
+        }).then(data => {
+            console.log("ResponseDate >>>>>0, ", data)
+        }).catch(err => {
+            console.log(err, 'Error--')
+        });
+        this.socket.emit('pickUp', { data: { cabId, location }});
+    };
+
+    _markAbsent = (value) => {
+      const { _id } = this.state.user;
+      const { cabId } = this.state.cab;
+      if (_id && cabId) {
+        fetch(`http://10.1.2.34:9000/cab/${cabId}`, {
+            method: 'PUT',
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                title: "Notification",
-                body: "Pickup Done",
-                data: {
-                    msg: "Pickup Done herere"
-                }
+              presence: value,
+              userId: _id,  
             }),
-        }).then((response) => {
-            return response.json();
-        }).then((responseData) => {
-            console.log("ResponseDate >>>>>0, ", responseData)
-        });
-        socket.emit('pickUp', { data: {cabId: 1, location: '123' }});
+          }).then(response => {
+              return response.json();
+          }).then(data => {
+              console.log("ResponseDate >>>>>0, ", data)
+          }).catch(err => {
+              console.log(err, 'Error--')
+          });
+      }
     };
 
-    _markAbsent = () => {
-        console.log("Absent Today done");
-    };
+    _addDelay = () => {};
 
     _keyExtractor = (item, index) => index;
 
     render() {
+        const { user, mates } = this.state;
         return (
             <View style={{flex: 1}}>
-                {/*<Text>Hello World</Text>*/}
-
                 <ScrollView>
                     <View style={{flex: 1}}>
-                        <View style={{
-                            flex: .3,
-                            margin: 20,
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            borderRadius: 50
-                        }}>
+                        <View style={styles.base}>
                             <View style={styles.logo}>
                                 <View style={styles.logoContainer}>
                                     <Image
@@ -173,13 +147,11 @@ export default class List extends Component {
                                     />
                                 </View>
                             </View>
-                            <Text style={{
-                                fontSize: 20,
-                                fontWeight: "bold",
-                                marginBottom: 5
-                            }}>{this.state.user.name}</Text>
-                            <Text style={{fontSize: 18, fontWeight: "bold"}}>{this.state.user.email}</Text>
-
+                            <Text style={styles.userName}>{user.name}</Text>
+                            <View style={{flex: .3, alignItems: 'center', justifyContent: 'center'}}>
+                                <Switch accessible={false} value={user.presence} onValueChange={(value) => { this._markAbsent(value); }}></Switch>
+                            </View>
+                            <Text style={{fontSize: 18, fontWeight: "bold"}}>{user.email}</Text>
                             <View style={{
                                 flex: .5,
                                 flexDirection: "row",
@@ -192,109 +164,90 @@ export default class List extends Component {
                                     <Text style={{color: "#ffff"}}> Pickup Done </Text>
                                 </TouchableHighlight>
 
-                                <TouchableHighlight style={styles.button}
-                                                    onPress={this._markAbsent}>
-                                    <Text style={{color: "#ffff"}}> Absent </Text>
+                                <TouchableHighlight style={styles.button} onPress={this._addDelay}>
+                                    <Text style={{color: "#ffff"}}> Delay </Text>
                                 </TouchableHighlight>
                             </View>
-
                         </View>
 
                         <View style={{margin: 5, borderBottomWidth: 2, width: "100%"}}></View>
 
                         <View style={{flex: .7}}>
-
                             <View style={{padding: 5, alignItems: "center", justifyContent: "center"}}>
-                                <Text style={{fontSize: 18, fontWeight: "bold"}}>Cab Members Detail</Text>
+                                <Text style={{fontSize: 18, fontWeight: "bold"}}>Cab Mates</Text>
                             </View>
-
-
                             <FlatList
-                                data={this.state.users}
+                                data={mates}
                                 keyExtractor={this._keyExtractor}
-                                renderItem={({item, index}) => <View style={{borderBottomWidth: 1, borderColor: "#ddd"}}
-                                                                     key={index}>
-                                    <TouchableHighlight style={{flex: 1}}
-                                                        onPress={() => navigate("Detail", {id: item.id})}>
+                                renderItem={({item, index}) => <View style={{borderBottomWidth: 1, borderColor: "#ddd"}} key={index}>
+                                    <TouchableHighlight style={{flex: 1}} onPress={() => navigate("Detail", {id: item.id})}>
                                         <View style={{flex: 1, flexDirection: "row"}}>
                                             <View style={{flex: .7, flexWrap: 'wrap'}}>
                                                 <View style={styles.content}>
-                                                    <View>
-                                                        <Text style={styles.title}>{index + 1}. {item.name}</Text>
-                                                    </View>
-                                                    <View>
-                                                        <Text>{item.email}</Text>
-                                                    </View>
+                                                    <View><Text style={styles.title}>{item.name}</Text></View>
+                                                    <View><Text>{item.email}</Text></View>
                                                 </View>
-                                            </View>
-                                            <View style={{flex: .3, alignItems: 'center', justifyContent: 'center'}}>
-                                                <Switch accessible={false} value={item.present} onValueChange={() => {
-                                                }}></Switch>
                                             </View>
                                         </View>
                                     </TouchableHighlight>
                                 </View>}
                             />
                         </View>
-
-
                     </View>
-
-
                 </ScrollView>
 
 
                 {/*<Text>{this.state.notification}</Text>
 
-                <View style={{height: 50, alignItems: "center", justifyContent: "center", padding: 10, margin: 10}}>
-                    <Text>{this.state.user.name}</Text>
-                    <Text>{this.state.user.email}</Text>
-                </View>
+                 <View style={{height: 50, alignItems: "center", justifyContent: "center", padding: 10, margin: 10}}>
+                 <Text>{this.state.user.name}</Text>
+                 <Text>{this.state.user.email}</Text>
+                 </View>
 
-                <View style={{
-                    height: 100,
-                    alignItems: "flex-start",
-                    height: 50,
-                    flexDirection: 'row',
-                    justifyContent: "flex-end"
-                }}>
-                    <TouchableHighlight style={styles.button}
-                                        onPress={this._pickUp}>
-                        <Text> Pickup Done </Text>
-                    </TouchableHighlight>
+                 <View style={{
+                 height: 100,
+                 alignItems: "flex-start",
+                 height: 50,
+                 flexDirection: 'row',
+                 justifyContent: "flex-end"
+                 }}>
+                 <TouchableHighlight style={styles.button}
+                 onPress={this._pickUp}>
+                 <Text> Pickup Done </Text>
+                 </TouchableHighlight>
 
-                    <TouchableHighlight style={styles.button}
-                                        onPress={this._markAbsent}>
-                        <Text> Absent </Text>
-                    </TouchableHighlight>
-                </View>
+                 <TouchableHighlight style={styles.button}
+                 onPress={this._markAbsent}>
+                 <Text> Absent </Text>
+                 </TouchableHighlight>
+                 </View>
 
-                <ScrollView>
+                 <ScrollView>
 
-                    <FlatList
-                        data={this.state.users}
-                        keyExtractor={this._keyExtractor}
-                        renderItem={({item, index}) => <View key={index}>
-                            <TouchableHighlight style={{flex: 1}} onPress={() => navigate("Detail", {id: item.id})}>
-                                <View style={{flex: 1, flexDirection: "row"}}>
-                                    <View style={{flex: .7, flexWrap: 'wrap'}}>
-                                        <View style={styles.content}>
-                                            <View>
-                                                <Text style={styles.title}>{index + 1}. {item.name}</Text>
-                                            </View>
-                                            <View>
-                                                <Text>{item.email}</Text>
-                                            </View>
-                                        </View>
-                                    </View>
-                                    <View style={{flex: .3, alignItems: 'center', justifyContent: 'center'}}>
-                                        <Text> Present </Text>
-                                    </View>
-                                </View>
-                            </TouchableHighlight>
-                        </View>}
-                    />
-                </ScrollView>*/}
+                 <FlatList
+                 data={this.state.users}
+                 keyExtractor={this._keyExtractor}
+                 renderItem={({item, index}) => <View key={index}>
+                 <TouchableHighlight style={{flex: 1}} onPress={() => navigate("Detail", {id: item.id})}>
+                 <View style={{flex: 1, flexDirection: "row"}}>
+                 <View style={{flex: .7, flexWrap: 'wrap'}}>
+                 <View style={styles.content}>
+                 <View>
+                 <Text style={styles.title}>{index + 1}. {item.name}</Text>
+                 </View>
+                 <View>
+                 <Text>{item.email}</Text>
+                 </View>
+                 </View>
+                 </View>
+                 <View style={{flex: .3, alignItems: 'center', justifyContent: 'center'}}>
+                 <Text> Present </Text>
+                 </View>
+                 </View>
+                 </TouchableHighlight>
+                 </View>}
+                 />
+                 </ScrollView>*/}
 
             </View>
         )
@@ -302,6 +255,13 @@ export default class List extends Component {
 }
 
 const styles = StyleSheet.create({
+    base: {
+        flex: .3,
+        margin: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 50
+    },
     logoContainer: {
         height: 100,
         width: 100,
@@ -363,6 +323,11 @@ const styles = StyleSheet.create({
     },
     headerText: {
         fontSize: 18
+    },
+    userName: {
+        fontSize: 20,
+        fontWeight: "bold",
+        marginBottom: 5
     }
-})
+});
 
