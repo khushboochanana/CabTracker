@@ -2,5 +2,6 @@
 node_modules
 .tmp
 tmp/*
-.App/expo
+.App/.expo
 .App/node_modules
+.expo
