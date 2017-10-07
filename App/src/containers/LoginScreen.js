@@ -21,8 +21,17 @@ const ID = {
 const GET_USER_ENDPOINT = 'http://10.1.12.33:9000/user';
 
 class LoginScreen extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      loader: true
+    }
+  }
 
   signInWithGoogleAsync = async () => {
+    this.setState({
+      loader: false
+    })
     let alreadyExists
     try {
       const result = await Expo.Google.logInAsync({
@@ -42,9 +51,9 @@ class LoginScreen extends Component {
           return response.json();
         })
 
-        if (responseData && responseData[0] && responseData[0].email) {
-          alreadyExists = responseData[0].email
-          this.props.setDetails(responseData[0])
+        if (responseData && responseData.email) {
+          alreadyExists = responseData.email
+          this.props.setDetails(responseData)
           this.props.navigation.navigate("List");
         } else {
           this.props.navigation.navigate("UserDetailsForm");
@@ -70,11 +79,17 @@ class LoginScreen extends Component {
           </View>
         </View>
         <View style={styles.login}>
-          <View>
-            <TouchableHighlight style={styles.goggleLoginButton} onPress={this.signInWithGoogleAsync}>
-              <Text style={{color: "#ffffff", fontSize: 16}}>Login with Google</Text>
-            </TouchableHighlight>
-          </View>
+          { this.state.loader ?
+            <View>
+              <TouchableHighlight style={styles.goggleLoginButton} onPress={this.signInWithGoogleAsync}>
+                <Text style={{color: "#ffffff", fontSize: 16}}>Login with Google</Text>
+              </TouchableHighlight>
+            </View> :
+            <Image
+              style={{width: 200, height: 150}}
+              source={require('./../assets/loader.gif')}
+            />
+          }
         </View>
       </View>
     )
@@ -119,14 +134,6 @@ const styles = StyleSheet.create({
     padding: 8
   }
 })
-
-LoginScreen.defaultProps = {
-
-}
-
-LoginScreen.propTypes = {
-
-}
 
 const mapStateToProps = (state, ownProps) => {
   return {

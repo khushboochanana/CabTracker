@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 const io = require('socket.io-client');
 import get from 'lodash/get';
+import { connect } from 'react-redux';
 
 import Expo, { Permissions, Notifications } from 'expo';
 
@@ -26,7 +27,7 @@ async function registerForPushNotificationsAsync(id, token) {
     // Get the token that uniquely identifies this device
     let pushToken = await Notifications.getExpoPushTokenAsync();
     if (pushToken) {
-      fetch(`http://10.1.20.149:9000/user/${id}`, {
+      fetch(`http://10.1.12.33:9000/user/${id}`, {
           method: 'PUT',
           headers: {
             Accept: 'application/json',
@@ -42,18 +43,19 @@ async function registerForPushNotificationsAsync(id, token) {
           console.log("Error>>>>>>>>>>>>>>>>>>>>>>>>>>>>", err);
       });
     }
+    console.log("after push function....")
 }
 
-export default class List extends Component {
+class List extends Component {
     constructor(props) {
         super(props);
-        this.socket = io('http://192.168.42.238:9000');
-        this.state = {
+        this.socket = io('http://10.1.12.33:9000');
+       this.state = {
           notification: '',
-          user: props && props.user,
+          user: get(props, 'user.user'),
           mates: get(props, 'cab.cabMates'),
           cab: get(props, 'cab'),
-        }
+       }
     }
 
     async componentDidMount() {
@@ -73,7 +75,6 @@ export default class List extends Component {
     }
 
     _handleNotification = (notification) => {
-      console.log("==================", notification);
       const msg = get(notification, 'data.msg');
       if (msg) {
         // this.props.navigation.navigate("Detail", {id : parseInt(notification.data.id)});
@@ -84,7 +85,7 @@ export default class List extends Component {
     _pickUp = () => {
       const { cabId, location } = get(this.state, 'user');
       if (cabId && location) {
-          fetch(`http://10.1.2.34:9000/user/${cabId}/notification`, {
+          fetch(`http://10.1.12.33:9000/user/${cabId}/notification`, {
               method: 'POST',
               headers: {
                   Accept: 'application/json',
@@ -112,7 +113,7 @@ export default class List extends Component {
       const userId = get(this.state, 'user._id');
       const cabId = get(this.state, 'cab.cabId');
       if (userId && cabId) {
-        fetch(`http://10.1.2.34:9000/cab/${cabId}`, {
+        fetch(`http://10.1.12.33:9000/cab/${cabId}`, {
             method: 'PUT',
             headers: {
                 Accept: 'application/json',
@@ -344,3 +345,11 @@ const styles = StyleSheet.create({
     }
 });
 
+
+const mapStateToProps = (state) => {
+  return {
+    user: state.user,
+  }
+}
+
+export default connect(mapStateToProps)(List)

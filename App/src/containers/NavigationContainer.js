@@ -31,4 +31,4 @@ const stackNav = {
   }
 }
 
-export default StackNavigator(stackNav, {initialRouteName : "List" });
+export default StackNavigator(stackNav, {initialRouteName : "Splash" });
