@@ -1,5 +1,5 @@
 'use strict';
-const mongoose =  require('mongoose');
+const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 var UserSchema = new Schema({
@@ -9,13 +9,13 @@ var UserSchema = new Schema({
     googleId: String,
     pushToken: String,
     location: Object,
-    cabId:String,
+    cabId: String,
     image: {
-      title: String,
-      publicId: String,
+        title: String,
+        publicId: String,
     },
     phoneNumber: String,
 });
 
-const User = mongoose.model('User', UserSchema);
+const User = mongoose.model('user', UserSchema);
 export default User;
