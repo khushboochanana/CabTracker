@@ -41,7 +41,7 @@ const addRoster = (req, res) => {
  */
 const updateRoster = (req, res) => {
   const { id } = req.params;
-  const { userId, presence, arrivalTime, driver, name } = req.body;
+  const { userId, presence, arrivalTime, driver, name, cabMates } = req.body;
   let updatedObj = {};
   Cab.findById({ _id: id }).lean().exec((err, cab) => {
     if (err) return res.status(401).json(err);
@@ -62,6 +62,9 @@ const updateRoster = (req, res) => {
     }
     if (name) {
       updatedObj.name = name;
+    }
+    if (cabMates) {
+      updatedObj.cabMates = cabMates;
     }
     Cab.update({ _id: id }, { $set: updatedObj }, (err, cab) => {
       if (err) return res.status(401).json(err);
