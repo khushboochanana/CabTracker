@@ -12,18 +12,21 @@ const stackNav = {
     screen : SplashScreen
   },
   LoginScreen : {
-    screen : LoginScreen
+    screen : LoginScreen,
+    navigationOptions : {
+      headerLeft: null
+    }
   },
   List : {
     screen : List,
     navigationOptions : {
-      title : "Detail"
+      headerLeft: null
     }
   },
   UserDetailsForm : {
     screen : UserDetailsForm,
     navigationOptions : {
-      title : "Select Items"
+      headerLeft: null
     }
   },
   Map : {
