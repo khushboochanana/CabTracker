@@ -35,7 +35,7 @@ class SplashScreen extends Component {
         source={{uri: 'http://res.cloudinary.com/hiuj1tri8/image/upload/v1507405497/taxi-background_wh5tqt.jpg'}}
       >
         <View style={styles.container}>
-          <Text style={styles.appName} >HAcker-Cab-TracKer</Text>
+          <Text style={styles.appName} >TTN-Cab-TracKer</Text>
         </View>
       </Image>
     )
