@@ -10,13 +10,14 @@ import {
   ScrollView,
 } from "react-native";
 import Expo from 'expo';
+import get from 'lodash/get';
 
 import { getDetails, setDetails } from '../actions/index';
 
 const ID = {
   "android": "6981964509-icr06um0k71sv2g9uelefk9jnkf51k01.apps.googleusercontent.com",
   "ios": "6981964509-g8nd0e1ejvjs8qrtoomdcev9r9cmupvo.apps.googleusercontent.com"
-}
+};
 
 const GET_USER_ENDPOINT = 'http://10.1.2.34:9000/user';
 
@@ -24,24 +25,22 @@ class LoginScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      loader: true
+      loader: false,
     }
   }
 
   signInWithGoogleAsync = async () => {
-    this.setState({
-      loader: false
-    })
-    let alreadyExists
+    this.setState({ loader: true });
+    let alreadyExists;
     try {
       const result = await Expo.Google.logInAsync({
         androidClientId: ID.android,
         iosClientId: ID.ios,
         scopes: ['profile', 'email'],
       });
-      if (result.type === 'success' && result.user) {
+      if (result && result.type === 'success' && result.user) {
         if ( /@tothenew.com\s*$/.test(result.user.email) ) {
-          this.props.setDetails(result)
+          this.props.setDetails(result);
           let responseData = await fetch(GET_USER_ENDPOINT+`/${result.user.email}`, {
             method: 'GET',
             headers: {
@@ -50,7 +49,7 @@ class LoginScreen extends Component {
             },
           }).then((response)=>{
             return response.json();
-          })
+          });
           if (responseData && responseData.email) {
             alreadyExists = responseData.email
             this.props.setDetails(responseData)
@@ -59,21 +58,20 @@ class LoginScreen extends Component {
             this.props.navigation.navigate("UserDetailsForm");
           }
         } else {
-          this.setState({
-            loader: true
-          })
-          Alert.alert("Please Log In with tothenew mail id")
+          this.setState({ loader: false });
+          Alert.alert("Please Login via tothenew mail id")
         }
       } else {
         Alert.alert("Google Login Failed, Please try again after some time")
       }
     } catch(e) {
-      return {error: true};
+      return { error: false };
     }
-  }
+  };
 
   render() {
-    const {navigate} = this.props.navigation;
+    const { navigate } = this.props.navigation;
+    const { loader } = this.state;
     return (
     <Image
       style={styles.backgroundImage}
@@ -83,16 +81,19 @@ class LoginScreen extends Component {
         <View style={styles.logo}>
           <View style={styles.logoContainer}>
             <Image
-              style={{width: 150, height: 150, borderRadius: 75}}
+              style={styles.image}
               source={{uri: 'http://res.cloudinary.com/hiuj1tri8/image/upload/v1507387195/cab_snwgzs.png'}}
             />
           </View>
         </View>
         <View style={styles.login}>
-          {this.state.loader ?
+          {!loader ?
             <View>
-              <TouchableHighlight style={styles.goggleLoginButton} onPress={this.signInWithGoogleAsync}>
-                <Text style={{color: "#ffffff", fontSize: 16}}>Login with Google</Text>
+              <TouchableHighlight
+                style={styles.goggleLoginButton}
+                onPress={this.signInWithGoogleAsync}
+              >
+                <Text style={styles.buttonText}>Login with Google</Text>
               </TouchableHighlight>
             </View> :
             <Image
@@ -108,6 +109,15 @@ class LoginScreen extends Component {
 }
 
 const styles = StyleSheet.create({
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+  },
+  image: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+  },
   logoContainer: {
     height: 150,
     width: 150,
@@ -149,17 +159,17 @@ const styles = StyleSheet.create({
     width: window.width,
     flexDirection: 'column'
   },
-})
+});
 
 const mapStateToProps = (state, ownProps) => {
   return {
     user: state.user,
   }
-}
+};
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
   getDetails: () => (dispatch(getDetails())),
   setDetails: (value) => dispatch(setDetails(value)),
-})
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(LoginScreen)

@@ -27,7 +27,7 @@ async function registerForPushNotificationsAsync(id, token) {
 
     // Get the token that uniquely identifies this device
     let pushToken = await Notifications.getExpoPushTokenAsync();
-    if (pushToken) {
+    if (pushToken && id) {
         fetch(`http://10.1.2.34:9000/user/${id}`, {
             method: 'PUT',
             headers: {
@@ -41,10 +41,9 @@ async function registerForPushNotificationsAsync(id, token) {
         }).then(data => {
             console.log("ResponseDate >>>>>", data)
         }).catch(err => {
-            console.log("Error>>>>>>>>>>>>>>>>>>>>>>>>>>>>", err);
+            console.log("Error>>>>>>>>", err);
         });
     }
-    console.log("after push function....")
 }
 
 class List extends Component {
@@ -67,16 +66,8 @@ class List extends Component {
 
     componentWillMount() {
         var cabId = get(this.state, 'user.cabId');
-
-
-        // Alert.alert("Date >>> : " + JSON.stringify(this.props.user))
-        // Alert.alert("Date >>> : " + cabId);
-
         cabId = "59d90d73734d1d18c95c8ef8";
-
         if (cabId) {
-
-
             fetch(`http://10.1.2.34:9000/cab/${cabId}`, {
                 method: 'GET',
                 headers: {
@@ -110,7 +101,7 @@ class List extends Component {
     };
 
     _pickUp = () => {
-        const {cabId, location} = get(this.state, 'user');
+        const { cabId, location } = get(this.state, 'user');
         if (cabId && location) {
             fetch(`http://10.1.2.34:9000/user/${cabId}/notification`, {
                 method: 'POST',
@@ -234,6 +225,7 @@ class List extends Component {
                                                 <View style={styles.content}>
                                                     <View><Text style={styles.title}>{item && item.name}</Text></View>
                                                     <View><Text>{item && item.emailId}</Text></View>
+                                                    <view style={{height: 10, width: 10,backgroundColor: 'green'}}></view>
                                                 </View>
                                             </View>
                                         </View>

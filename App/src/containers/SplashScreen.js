@@ -5,15 +5,20 @@ import {
   StyleSheet,
   AsyncStorage,
   Image
-} from "react-native"
+} from "react-native";
+import { connect } from 'react-redux';
 
-export default class SplashScreen extends Component {
+import { setDetails } from '../actions/index';
+
+class SplashScreen extends Component {
 
   setTimePassed = async () => {
-    let loggedIn = await AsyncStorage.getItem("auth-key");
+    const loggedIn = await AsyncStorage.getItem("auth-key");
     if (loggedIn) {
+      this.props.setDetails(JSON.parse(loggedIn));
       this.props.navigation.navigate("List");
     } else {
+      AsyncStorage.removeItem("auth-key");
       this.props.navigation.navigate("LoginScreen");
     }
   };
@@ -21,7 +26,7 @@ export default class SplashScreen extends Component {
   componentWillMount() {
     setTimeout(() => {
       this.setTimePassed();
-    },3000);
+    }, 3000);
   }
 
   render() {
@@ -31,11 +36,7 @@ export default class SplashScreen extends Component {
         source={{uri: 'http://res.cloudinary.com/hiuj1tri8/image/upload/v1507405497/taxi-background_wh5tqt.jpg'}}
       >
         <View style={styles.container}>
-          <Text
-            style={{position:'absolute',left:50,top:260,fontSize: 29, alignItems: "center",
-            justifyContent: "center",zIndex: 9999, color: '#fff', fontWeight: 'bold' }} >HAcker-Cab-TracKer
-          </Text>
-
+          <Text style={styles.appName} >HAcker-Cab-TracKer</Text>
         </View>
       </Image>
     )
@@ -47,6 +48,17 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'transparent'
   },
+  appName:{
+    position:'absolute',
+    left:50,
+    top:260,
+    fontSize: 29,
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 9999,
+    color: '#fff',
+    fontWeight: 'bold',
+  } ,
   backgroundImage: {
     flex: 1,
     height: window.height,
@@ -66,5 +78,17 @@ const styles = StyleSheet.create({
   icon:{
     flex: 1
   }
-})
+});
+
+const mapStateToProps = (state, ownProps) => {
+  return {
+    user: state.user,
+  }
+};
+
+const mapDispatchToProps = (dispatch, ownProps) => ({
+  setDetails: (value) => dispatch(setDetails(value)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(SplashScreen)
 
