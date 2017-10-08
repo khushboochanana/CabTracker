@@ -177,7 +177,7 @@ class List extends Component {
       const currentUser = mates.find(mate => mate.id === user._id);
         return (
             <View style={{flex: 1, backgroundColor: '#fff'}}>
-              <View style={{flexDirection: 'row', justifyContent: 'flex-end', marginRight: 12}}>
+              <View style={{flexDirection: 'row', justifyContent: 'flex-end', marginRight: 12, marginTop: 60}}>
                 <TouchableHighlight
                   style={styles.logOutButton}
                   onPress={this._logOut}>
