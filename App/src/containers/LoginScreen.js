@@ -18,7 +18,7 @@ const ID = {
   "ios": "6981964509-g8nd0e1ejvjs8qrtoomdcev9r9cmupvo.apps.googleusercontent.com"
 };
 
-const GET_USER_ENDPOINT = 'http://10.1.20.149:9000/user';
+const GET_USER_ENDPOINT = 'http://10.1.12.33:9000/user';
 
 class LoginScreen extends Component {
   constructor(props) {

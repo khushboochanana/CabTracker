@@ -16,7 +16,7 @@ import { saveData} from '../actions/index';
 import GooglePlacesInput from './../components/Geolocation'
 import { setDetails } from '../actions/index';
 
-const SAVE_USER_ENDPOINT = 'http://10.1.20.149:9000/user';
+const SAVE_USER_ENDPOINT = 'http://10.1.12.33:9000/user';
 
 class UserDetailsForm extends Component {
   constructor(props) {
@@ -158,7 +158,7 @@ class UserDetailsForm extends Component {
         <View style={styles.buttonView}>
           <TouchableHighlight
             style={styles.logOutButton}
-            onPress={this._logOut}>
+            onPress={this.logout}>
             <Text style={styles.buttonText}>
               Logout
             </Text>
@@ -254,6 +254,12 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontSize: 16,
+  },
+  backgroundImage: {
+    flex: 1,
+    height: window.height,
+    width: window.width,
+    flexDirection: 'column'
   },
 });
 
