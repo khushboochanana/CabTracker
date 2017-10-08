@@ -8,15 +8,19 @@ import get from 'lodash/get';
 
 import MapView from 'react-native-maps';
 
+const io = require('socket.io-client');
+
 export default class Map extends Component {
     constructor(props) {
         super(props);
+        this.socket = io('http://10.1.2.34:9000');
         this.state = {
+            pickup: false,
             region: {
                 "latitude": 28.617927832148517,
-                "latitudeDelta": 1.5881326098174604,
+                "latitudeDelta": 0.922,
                 "longitude": 77.0268389582634,
-                "longitudeDelta": 1.4802477881312228
+                "longitudeDelta": 0.0922
             },
             lines: [],
             markers: [],
@@ -27,8 +31,13 @@ export default class Map extends Component {
         }
     }
 
+
+
     componentDidMount() {
         var mates = get(this.props, 'navigation.state.params.mates');
+        var cabId = get(this.props, 'navigation.state.params.user.cabId');
+        var user = get(this.props, 'navigation.state.params.user');
+
         if (!mates) {
             mates = []
         }
@@ -43,18 +52,103 @@ export default class Map extends Component {
             return marker;
         });
 
-        console.log("markers >>>>> ", markers);
+        console.log("markers >>>>> ", cabId, markers);
 
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                var region = {...this.state.region};
-                region.latitude = position.coords.latitude;
-                region.longitude = position.coords.longitude;
-                this.setState({region, markers});
-            },
-            (error) => this.setState({}),
-            {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
-        );
+        this.setState({markers});
+
+
+        var self = this;
+
+        this.socket.on('connect', () => {
+            console.log('connected', user.email);
+            this.socket.emit('joined', {data: {cabId, sender: user._id}});
+
+            let emitPickup = (data) => {
+                console.log("emitPickup", data);
+                this.socket.emit("pickUp", {
+                    data: data
+                });
+            }
+
+            this.socket.on('updateLocation', (data) => {
+                console.log('updateLocation', user.email, user._id);
+                console.log("data", user.email, data, user._id);
+
+                const socket = this.socket;
+
+                if (data.data.sender == user._id) {
+                    console.log(">in if .............", user._id)
+
+
+                    let getlocation = () => {
+                        console.log("getlocation called")
+                        navigator.geolocation.getCurrentPosition(
+                            (position) => {
+
+                                console.log("======", position)
+
+                                var region = {...self.state.region};
+                                region.latitude = position.coords.latitude;
+                                region.longitude = position.coords.longitude;
+
+                                // self.socket.emit("pickUp", {
+                                //     data: {
+                                //         cabId,
+                                //         latitude: region.latitude,
+                                //         longitude: region.longitude,
+                                //         sender: user._id
+                                //     }
+                                // });
+
+
+                                emitPickup({
+                                    cabId,
+                                    latitude: region.latitude,
+                                    longitude: region.longitude,
+                                    sender: user._id
+                                })
+
+                                self.setState({region, pickup: true});
+
+
+                                setTimeout(() => {
+                                    getlocation();
+                                }, 1000)
+                            },
+                            (error) => {
+                                console.log("error", error)
+
+                                setTimeout(() => {
+                                    getlocation();
+                                }, 2000)
+                            },
+                            {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
+                        );
+                    }
+
+                    getlocation()
+
+                    // setInterval(() => {
+                    //     console.log("Setinterval called >>>>", )
+                    //
+                    // }, 1000)
+
+                } else {
+                    console.log(">in Elseee .............", user._id, data.data)
+
+
+                    if (data.data && data.data.latitude && data.data.longitude) {
+                        console.log(">>>>>>>>>>>>>1")
+                        var region = {...self.state.region};
+                        region.latitude = data.data.latitude;
+                        region.longitude = data.data.longitude;
+                        self.setState({region, pickup: true});
+                    }
+
+                }
+            })
+        })
+
 
     }
 
@@ -71,7 +165,7 @@ export default class Map extends Component {
                 <MapView style={{flex: 1}}
                          region={this.state.region}
                          onRegionChange={this.onRegionChange}
-                         showsUserLocation={true} followsUserLocation={true} showsMyLocationButton={true}>
+                         showsUserLocation={this.state.pickup} followsUserLocation={this.state.pickup}>
 
                     {this.state.markers.map((marker, index) => (
                         <MapView.Marker

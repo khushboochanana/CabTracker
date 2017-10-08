@@ -20,6 +20,11 @@ const pathToControllers = path.resolve(__dirname, './server/controllers') + "/";
 
 mongoose.connect('mongodb://heroku_k2pz1bq2:ta7ni3luchib79d4mo8d4hbv71@ds113505.mlab.com:13505/heroku_k2pz1bq2');
 
+app.use((req, res, next) => {
+    console.log("Request :", req.url, req.params, req.body)
+    next();
+});
+
 fs.readdirSync(pathToRoutes).forEach((file) => {
     require(pathToRoutes + file)(app, require(pathToControllers + file))
 });

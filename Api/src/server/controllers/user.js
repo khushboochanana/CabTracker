@@ -83,7 +83,7 @@ const notification = (req, res) => {
             })
         })
 
-        res.send(200)
+        res.send(200, {})
 
     })
 }

@@ -68,7 +68,7 @@ class List extends Component {
         let cabId = get(this.state, 'user.cabId');
         cabId = "59d90d73734d1d18c95c8ef8";
         if (cabId) {
-            fetch(`http://10.1.20.149:9000/cab/${cabId}`, {
+            fetch(`http://10.1.12.33:9000/cab/${cabId}`, {
                 method: 'GET',
                 headers: {
                   Accept: 'application/json',
@@ -121,10 +121,11 @@ class List extends Component {
                 return response.json();
             }).then(data => {
                 console.log("ResponseDate, ", data)
+                this.props.navigation.navigate("Map", { mates : this.state.mates, user : this.state.user });
             }).catch(err => {
                 console.log(err, 'Error--')
             });
-            this.socket.emit('pickUp', { data: { cabId, location } });
+            // this.socket.emit('pickUp', { data: { cabId , sender :  this.state.user._id} });
         }
     };
 
@@ -153,7 +154,7 @@ class List extends Component {
     };
 
     _gotoMap = () => {
-        this.props.navigation.navigate("Map", { mates : this.state.mates });
+        this.props.navigation.navigate("Map", { mates : this.state.mates, user: {cabId:this.state.user.cabId} });
     };
 
     _keyExtractor = (item, index) => index;
