@@ -229,7 +229,7 @@ class List extends Component {
                         </View>
                     </View>
                     <View style={{flex: .7}}>
-                        <View style={{alignItems: "center", justifyContent: "center"}}>
+                        <View style={{alignItems: "center", justifyContent: "center", marginBottom: 10}}>
                             <Text style={{fontSize: 18, fontWeight: "bold"}}>Cab Mates</Text>
                         </View>
                         <FlatList
@@ -244,11 +244,11 @@ class List extends Component {
                                       style={{flex: 1}}
                                       onPress={() => navigate("Detail", { id: item && item.id })}>
                                       <View style={{flex: 1, flexDirection: "row", alignItems: 'center'}}>
-                                        <View style={{flex: 1, flexDirection: "row", alignItems: 'center'}}>
+                                        <View style={{flex: 0.8, flexDirection: "row", alignItems: 'center'}}>
                                           <View style={styles.matesImage}>
                                             <Image
                                               style={{width: 30, height: 30, borderRadius: 15}}
-                                              source={{uri: item.image ? item.image : 'http://res.cloudinary.com/hiuj1tri8/image/upload/v1507431020/blank_qprtf9.jpg'}}
+                                              source={{uri: item.image || 'http://res.cloudinary.com/hiuj1tri8/image/upload/v1507431020/blank_qprtf9.jpg'}}
                                             />
                                           </View>
                                           <View style={styles.content}>
@@ -256,14 +256,19 @@ class List extends Component {
                                             <View><Text>{item && item.emailId}</Text></View>
                                           </View>
                                         </View>
-                                        <View style={item && item.presence ? styles.circle : styles.absent} />
-                                      <TouchableHighlight
-                                          style={{flex: 1}}
-                                          onPress={() => this.calling(item.phoneNumber)}>
-                                          <View>
-                                            <Text>Call</Text>
-                                          </View>
-                                      </TouchableHighlight>
+                                        <View style={{flex: 0.2, flexDirection: "row",}}>
+                                          <TouchableHighlight
+                                            style={{flex: 1}}
+                                            onPress={() => this.calling(item.phoneNumber)}>
+                                            <View style={{width: 20, height: 20, borderRadius: 5}}>
+                                              <Image
+                                                style={{width: 20, height: 20}}
+                                                source={{uri: 'http://res.cloudinary.com/hiuj1tri8/image/upload/v1507447627/2017-10-08_b4poao.png'}}
+                                              />
+                                            </View>
+                                          </TouchableHighlight>
+                                          <View style={item && item.presence ? styles.circle : styles.absent} />
+                                        </View>
                                       </View>
                                     </TouchableHighlight>
                                   </View>
@@ -338,7 +343,7 @@ const styles = StyleSheet.create({
     width: 15,
     height: 15,
     borderRadius: 50,
-    marginRight: 30,
+    marginRight: 20,
     backgroundColor: 'green',
     marginTop: 3,
   },
@@ -354,6 +359,7 @@ const styles = StyleSheet.create({
     base: {
         flex: .3,
         margin: 20,
+        marginBottom: 10,
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 50
