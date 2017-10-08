@@ -67,7 +67,7 @@ class List extends Component {
         let cabId = get(this.state, 'user.cabId');
         cabId = "59d90d73734d1d18c95c8ef8";
         if (cabId) {
-            fetch(`http://10.1.2.34:9000/cab/${cabId}`, {
+            fetch(`http://10.1.12.33:9000/cab/${cabId}`, {
                 method: 'GET',
                 headers: {
                   Accept: 'application/json',
@@ -103,7 +103,7 @@ class List extends Component {
     _pickUp = () => {
         const { cabId, location } = get(this.state, 'user');
         if (cabId && location) {
-            fetch(`http://10.1.2.34:9000/user/${cabId}/notification`, {
+            fetch(`http://10.1.12.33:9000/user/${cabId}/notification`, {
                 method: 'POST',
                 headers: {
                     Accept: 'application/json',
@@ -119,11 +119,11 @@ class List extends Component {
             }).then(response => {
                 return response.json();
             }).then(data => {
-                console.log("ResponseDate >>>>>0, ", data)
+                console.log("ResponseDate, ", data)
             }).catch(err => {
                 console.log(err, 'Error--')
             });
-            this.socket.emit('pickUp', {data: {cabId, location}});
+            this.socket.emit('pickUp', { data: { cabId, location } });
         }
     };
 
@@ -131,7 +131,7 @@ class List extends Component {
         const userId = get(this.state, 'user._id');
         const cabId = get(this.state, 'cab.cabId');
         if (userId && cabId) {
-            fetch(`http://10.1.2.34:9000/cab/${cabId}`, {
+            fetch(`http://10.1.12.33:9000/cab/${cabId}`, {
                 method: 'PUT',
                 headers: {
                   Accept: 'application/json',
@@ -157,10 +157,10 @@ class List extends Component {
 
     _keyExtractor = (item, index) => index;
 
-    logout = () => {
-      AsyncStorage.removeItem("auth-key");
-      this.props.navigation.navigate("LoginScreen");
-    };
+  _logOut = () => {
+    AsyncStorage.removeItem("auth-key");
+    this.props.navigation.navigate("LoginScreen");
+  };
 
   render() {
       const { user, mates } = this.state;
@@ -169,75 +169,84 @@ class List extends Component {
         return (
             <View style={{flex: 1, backgroundColor: '#fff'}}>
               <View>
-                <TouchableHighlight style={styles.logOutButton} onPress={this.logout}>
-                  <Text style={{color: "#ffffff", fontSize: 16}}>
-                    Logout
-                  </Text>
+                <TouchableHighlight
+                  style={styles.logOutButton}
+                  onPress={this._logOut}>
+                    <Text style={{color: "#ffffff", fontSize: 16}}>
+                      Logout
+                    </Text>
                 </TouchableHighlight>
               </View>
 
                 <ScrollView>
-                    <View style={{flex: 1}}>
-                        <View style={styles.base}>
-                            <View style={styles.logo}>
-                                <View style={styles.logoContainer}>
-                                    <Image
-                                        style={{width: 100, height: 100, borderRadius: 75}}
-                                        source={{uri: 'https://facebook.github.io/react/img/logo_og.png'}}
-                                    />
-                                </View>
-                            </View>
-                            <Text style={styles.userName}>{user && user.name}</Text>
-                            <Text style={{fontSize: 18, fontWeight: "bold"}}>{user && user.email}</Text>
-                          <View style={{flex: .3, alignItems: 'center', justifyContent: 'center', marginTop: 10}}>
-                            <Switch value={currentUser && currentUser.presence} onValueChange={(value) => { this._markAbsent(value); }}></Switch>
+                  <View style={{flex: 1}}>
+                    <View style={styles.base}>
+                      <View style={styles.logo}>
+                          <View style={styles.logoContainer}>
+                              <Image
+                                style={{width: 100, height: 100, borderRadius: 75}}
+                                source={{uri: 'https://facebook.github.io/react/img/logo_og.png'}}
+                              />
                           </View>
-                            <View style={{
-                                flex: 1,
-                                flexDirection: "row",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                marginTop: 20,
-                            }}>
-                                <TouchableHighlight
-                                    style={styles.button}
-                                    onPress={this._pickUp}>
-                                    <Text style={{color: "#ffff"}}> Pickup Done </Text>
-                                </TouchableHighlight>
+                      </View>
+                        <Text style={styles.userName}>{user && user.name}</Text>
+                        <Text style={{fontSize: 18, fontWeight: "bold"}}>{user && user.email}</Text>
+                      <View
+                        style={{flex: .3, alignItems: 'center', justifyContent: 'center', marginTop: 10}}>
+                        <Switch
+                          value={currentUser && currentUser.presence}
+                          onValueChange={(value) => { this._markAbsent(value); }}>
+                        </Switch>
+                      </View>
+                        <View style={{
+                          flex: 1,
+                          flexDirection: "row",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          marginTop: 20,
+                        }}>
+                            <TouchableHighlight
+                              style={styles.button}
+                              onPress={this._pickUp}
+                            >
+                              <Text style={{color: "#ffff"}}>Pickup Done</Text>
+                            </TouchableHighlight>
 
-                                <TouchableHighlight style={[styles.button, styles.background]} onPress={this._gotoMap}>
-                                    <Text style={{color: "#fff"}}> Map </Text>
-                                </TouchableHighlight>
-                            </View>
-                        </View>
-
-                        <View style={{flex: .7}}>
-                            <View style={{alignItems: "center", justifyContent: "center"}}>
-                                <Text style={{fontSize: 18, fontWeight: "bold"}}>Cab Mates</Text>
-                            </View>
-                            <FlatList
-                                data={mates}
-                                keyExtractor={this._keyExtractor}
-                                renderItem={({item, index}) => {
-                                    return (
-                                      <View style={{borderBottomWidth: 1, borderColor: "#ddd"}} key={index}>
-                                          <TouchableHighlight
-                                            style={{flex: 1}}
-                                            onPress={() => navigate("Detail", { id: item && item.id })}>
-                                              <View style={{flex: 1, flexDirection: "row", justifyContent: 'space-between', alignItems: 'center'}}>
-                                                  <View style={styles.content}>
-                                                      <View><Text style={styles.title}>{item && item.name}</Text></View>
-                                                      <View><Text>{item && item.emailId}</Text></View>
-                                                  </View>
-                                                  <View style={item && item.presence ? styles.circle : styles.absent} />
-                                              </View>
-                                          </TouchableHighlight>
-                                      </View>
-                                    )
-                                }}
-                            />
+                            <TouchableHighlight
+                              style={[styles.button, styles.background]}
+                              onPress={this._gotoMap}
+                            >
+                              <Text style={{color: "#fff"}}> Map </Text>
+                            </TouchableHighlight>
                         </View>
                     </View>
+                    <View style={{flex: .7}}>
+                        <View style={{alignItems: "center", justifyContent: "center"}}>
+                            <Text style={{fontSize: 18, fontWeight: "bold"}}>Cab Mates</Text>
+                        </View>
+                        <FlatList
+                            data={mates}
+                            keyExtractor={this._keyExtractor}
+                            renderItem={({item, index}) => {
+                                return (
+                                  <View style={{borderBottomWidth: 1, borderColor: "#ddd"}} key={index}>
+                                      <TouchableHighlight
+                                        style={{flex: 1}}
+                                        onPress={() => navigate("Detail", { id: item && item.id })}>
+                                          <View style={{flex: 1, flexDirection: "row", justifyContent: 'space-between', alignItems: 'center'}}>
+                                              <View style={styles.content}>
+                                                  <View><Text style={styles.title}>{item && item.name}</Text></View>
+                                                  <View><Text>{item && item.emailId}</Text></View>
+                                              </View>
+                                              <View style={item && item.presence ? styles.circle : styles.absent} />
+                                          </View>
+                                      </TouchableHighlight>
+                                  </View>
+                                )
+                            }}
+                        />
+                    </View>
+                  </View>
                 </ScrollView>
 
 
@@ -401,18 +410,13 @@ const styles = StyleSheet.create({
       marginTop: 15,
       display: 'flex',
       flexDirection: 'row',
-      justifyContent: 'space-around',
-      position: 'absolute',
-      right: 10,
-      top: 0,
-      zIndex: 999,
     }
 });
 
 const mapStateToProps = (state) => {
-    return {
-        user: state.user,
-    }
+  return {
+    user: state.user,
+  }
 };
 
 export default connect(mapStateToProps)(List)

@@ -18,18 +18,23 @@ const ID = {
   "ios": "6981964509-g8nd0e1ejvjs8qrtoomdcev9r9cmupvo.apps.googleusercontent.com"
 };
 
-const GET_USER_ENDPOINT = 'http://10.1.2.34:9000/user';
+const GET_USER_ENDPOINT = 'http://10.1.12.33:9000/user';
 
 class LoginScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
       loader: false,
+      saving: false,
     }
   }
 
   signInWithGoogleAsync = async () => {
-    this.setState({ loader: true });
+    this.setState({
+      loader: true,
+      saving: true,
+    });
+    if (this.state.saving) return;
     let alreadyExists;
     try {
       const result = await Expo.Google.logInAsync({
@@ -47,6 +52,7 @@ class LoginScreen extends Component {
               'Content-Type': 'application/json',
             },
           }).then((response)=>{
+            console.log("inside 3")
             return response.json();
           });
           if (responseData && responseData.email) {
@@ -57,14 +63,25 @@ class LoginScreen extends Component {
             this.props.navigation.navigate("UserDetailsForm");
           }
         } else {
-          this.setState({ loader: false });
+          this.setState({
+            loader: false,
+            saving: false,
+          });
           Alert.alert("Please Login via tothenew mail id")
         }
       } else {
+        this.setState({
+          loader: false,
+          saving: false,
+        });
         Alert.alert("Google Login Failed, Please try again after some time")
       }
     } catch(e) {
-      Alert.alert("Something went wrong. Please try again later!")
+      Alert.alert("Something went wrong. Please try again later!");
+      this.setState({
+        loader: false,
+        saving: false,
+      });
       return { error: true };
     }
   };
