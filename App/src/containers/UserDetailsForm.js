@@ -24,7 +24,8 @@ class UserDetailsForm extends Component {
     this.state = {
       data: {},
       phoneNumber: '',
-      location: ''
+      location: '',
+      error: '',
     }
   }
 
@@ -46,6 +47,7 @@ class UserDetailsForm extends Component {
 
   location = (data, details) => {
     this.setState({
+      error: '',
       location: {
         address: details.formatted_address,
         latlng: details.geometry.location
@@ -54,36 +56,43 @@ class UserDetailsForm extends Component {
   };
 
   save = () => {
+    const { data, location, phoneNumber } = this.state;
+    this.setState({ error: '' });
     const userData = {
-      email: this.state.data.user.email,
-      name: this.state.data.user.name,
-      image: this.state.data.user.photoUrl,
+      email: get(data, 'user.email'),
+      name: get(data, 'user.name'),
+      image: get(data, 'user.photoUrl'),
       location: {
-        latitude: this.state.location.latlng.lat,
-        longitude: this.state.location.latlng.lng,
-        name: this.state.location.address
+        latitude: get(location, 'latlng.lat'),
+        longitude: get(location, 'latlng.lng'),
+        name: location && location.address
       },
-      phoneNumber: this.state.phoneNumber,
-    }
+      phoneNumber: phoneNumber,
+    };
 
-    fetch(SAVE_USER_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(userData),
-    }).then((response)=>{
-      return response.json();
-    }).then((responseData) => {
-      AsyncStorage.setItem("auth-key", JSON.stringify(responseData));
-      this.props.setDetails(responseData)
-      this.props.navigation.navigate("List");
-    });
-  }
+    if (userData && userData.phoneNumber && userData.location) {
+      this.setState({error: ''});
+      fetch(SAVE_USER_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+      }).then((response)=>{
+        return response.json();
+      }).then((responseData) => {
+        AsyncStorage.setItem("auth-key", JSON.stringify(responseData));
+        this.props.setDetails(responseData)
+        this.props.navigation.navigate("List");
+      });
+    } else {
+      this.setState({ error: 'Both fields are required.'});
+    }
+  };
 
   render () {
-    const { data } = this.state;
+    const { data, error } = this.state;
     const userForm = data && data.user ? (
       <View style={styles.base}>
         <View style={styles.logoContainer}>
@@ -119,13 +128,14 @@ class UserDetailsForm extends Component {
               }}>
                 <TextInput
                   style={styles.textBox}
-                  onChangeText={(number) => this.setState({phoneNumber: number})}
+                  onChangeText={(number) => this.setState({phoneNumber: number, error: ''})}
                   value={this.state.phoneNumber}
                   placeholder='Enter phone number'
                   placeholderTextColor='#a4b2b9'
                 />
               </View>
             </View>
+            <View style={{height: 20}}><Text style={{color: '#d24b4b', fontSize: 17, marginTop: 10}}>{error}</Text></View>
             <View style={styles.buttonView}>
               <TouchableHighlight
                 style={[styles.logOutButton, styles.saveButton]}
