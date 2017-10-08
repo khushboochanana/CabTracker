@@ -18,7 +18,6 @@ class SplashScreen extends Component {
       this.props.setDetails(JSON.parse(loggedIn));
       this.props.navigation.navigate("List");
     } else {
-      AsyncStorage.removeItem("auth-key");
       this.props.navigation.navigate("LoginScreen");
     }
   };

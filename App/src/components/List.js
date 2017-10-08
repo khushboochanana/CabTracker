@@ -168,7 +168,7 @@ class List extends Component {
       const currentUser = mates.find(mate => mate.id === user._id);
         return (
             <View style={{flex: 1, backgroundColor: '#fff'}}>
-              <View>
+              <View style={{flexDirection: 'row', justifyContent: 'flex-end', marginRight: 12}}>
                 <TouchableHighlight
                   style={styles.logOutButton}
                   onPress={this._logOut}>
@@ -177,7 +177,6 @@ class List extends Component {
                     </Text>
                 </TouchableHighlight>
               </View>
-
                 <ScrollView>
                   <View style={{flex: 1}}>
                     <View style={styles.base}>
@@ -341,7 +340,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'flex-end',
         marginBottom: 10,
-        marginTop: 30,
     },
     container: {
         flex: 1
@@ -408,8 +406,7 @@ const styles = StyleSheet.create({
       backgroundColor: '#CD5C5C',
       width: 100,
       marginTop: 15,
-      display: 'flex',
-      flexDirection: 'row',
+      alignItems: 'center',
     }
 });
 
