@@ -15,35 +15,23 @@ import {
 import Expo, {Permissions, Notifications} from 'expo';
 
 
-async function registerForPushNotificationsAsync(id) {
+async function registerForPushNotificationsAsync(id, pushToken) {
     const {status: existingStatus} = await Permissions.getAsync(
         Permissions.NOTIFICATIONS
     );
     let finalStatus = existingStatus;
 
-    // only ask if permissions have not already been determined, because
-    // iOS won't necessarily prompt the user a second time.
-    if (existingStatus !== 'granted') {
-        // Android remote notification permissions are granted during the app
-        // install, so this will only ask on iOS
-        const {status} = await Permissions.askAsync(Permissions.NOTIFICATIONS);
-        finalStatus = status;
+    if (existingStatus === 'granted' && pushToken) {
+        return;
     }
-
-    // Stop here if the user did not grant permissions
+    const {status} = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+    finalStatus = status;
     if (finalStatus !== 'granted') {
         return;
     }
-
     // Get the token that uniquely identifies this device
     let token = await Notifications.getExpoPushTokenAsync();
-
-    console.log("======", token);
-    Alert.alert("Notification Toke is >> 22 ", token);
-
-
-    console.log("ure >>>>> :: ", `http://127.0.0.1:9000/user/${id}`);
-     fetch(`http://127.0.0.1:9000/user/${id}`, {
+    fetch(`http://10.1.2.34:9000/user/${id}`, {
         method: 'PUT',
         headers: {
             Accept: 'application/json',
@@ -52,13 +40,13 @@ async function registerForPushNotificationsAsync(id) {
         body: JSON.stringify({
             pushToken: token
         }),
-    }).then((response)=>{
+    }).then((response) => {
         return response.json();
-     }).then((responseData) => {
-         console.log("ResponseDate >>>>>0, ", responseData)
-     });
+    }).then((responseData) => {
+        console.log("ResponseDate >>>>>0, ", responseData)
+    });
 
-    return token
+    return
 }
 
 export default class List extends Component {
@@ -67,12 +55,12 @@ export default class List extends Component {
         this.state = {
             notification: '',
             user: {
-                "_id": "59d8a752e1bcadeed49b58b7",
+                "_id": "59d8b8905a02b0d59858caf2",
                 "name": "Rajesh",
                 "email": "rajesh@tothenew.com",
                 "provider": "google",
                 "googleId": "123",
-                "pushToken": "",
+                "pushToken": "dffsfsdfsa",
                 "location": {
                     "address": "",
                     "longitude": 0,
@@ -111,28 +99,40 @@ export default class List extends Component {
 
 
     async componentDidMount() {
-        registerForPushNotificationsAsync(this.state.user._id);
+        registerForPushNotificationsAsync(this.state.user._id, this.state.user.pushToken);
 
         this._notificationSubscription = Notifications.addListener(this._handleNotification);
 
     }
 
     _handleNotification = (notification) => {
-        console.log("==================", notification)
-        Alert.alert("Noticaton Arrivaed >>>>", JSON.stringify(notification.body));
+        console.log("==================", notification);
 
-        if (notification && notification.data && notification.data.id && parseInt(notification.data.id)) {
+        if (notification && notification.data && notification.data.msg) {
             // this.props.navigation.navigate("Detail", {id : parseInt(notification.data.id)});
-
-            this.setState({notification: notification.data.msg});
+            Alert.alert('Notification : ' + notification.data.msg);
         }
-
-        // this.setState({notification: notification.body});
-
     };
 
     _pickUp = () => {
-        console.log("Pick up done");
+        fetch(`http://10.1.2.34:9000/user/${this.state.user.cabId}/notification`, {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                title: "Notification",
+                body: "Pickup Done",
+                data: {
+                    msg: "Pickup Done herere"
+                }
+            }),
+        }).then((response) => {
+            return response.json();
+        }).then((responseData) => {
+            console.log("ResponseDate >>>>>0, ", responseData)
+        });
     }
 
     _markAbsent = () => {
@@ -145,7 +145,6 @@ export default class List extends Component {
         return (
             <View style={{flex: 1}}>
                 {/*<Text>Hello World</Text>*/}
-
 
                 <ScrollView>
                     <View style={{flex: 1}}>
