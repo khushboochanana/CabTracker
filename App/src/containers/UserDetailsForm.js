@@ -16,7 +16,7 @@ import { saveData} from '../actions/index';
 import GooglePlacesInput from './../components/Geolocation'
 import { setDetails } from '../actions/index';
 
-const SAVE_USER_ENDPOINT = 'http://10.1.12.33:9000/user';
+const SAVE_USER_ENDPOINT = 'http://10.1.20.149:9000/user';
 
 class UserDetailsForm extends Component {
   constructor(props) {
@@ -106,7 +106,7 @@ class UserDetailsForm extends Component {
             <Text style={styles.email}>{get(data, 'user.email')}</Text>
             <View style={styles.geolocation}>
               <View style={{width: 100}}>
-                <Text style={styles.location}>Location: </Text>
+                <Text style={styles.location}>Location : </Text>
               </View>
               <GooglePlacesInput
                 setLocation={this.location}
@@ -114,13 +114,11 @@ class UserDetailsForm extends Component {
             </View>
             <View style={styles.geolocation}>
               <View style={{width: 100}}>
-                <Text
-                  style={styles.location}
-                >Phone number: </Text>
+                <Text style={[styles.location, {marginLeft: 5}]}>Phone : </Text>
               </View>
               <View style={{
                 height: 45,
-                width: 255,
+                width: 230,
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderWidth: 6,
@@ -174,7 +172,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    marginTop: 10
   },
   buttonView: {
     flexDirection: 'row',
@@ -186,7 +183,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: '#fba800',
     width: 100,
-    marginTop: 5,
+    marginTop: 30,
     alignItems: 'center',
     justifyContent: 'flex-end',
   },
@@ -194,7 +191,7 @@ const styles = StyleSheet.create({
     flex:  1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 60,
+    marginTop: 40,
   },
   logoContainer: {
     height: 100,
@@ -244,7 +241,7 @@ const styles = StyleSheet.create({
     borderWidth: 6,
     height: 40,
     borderColor: '#c9c9ce',
-    width: 250,
+    width: 230,
     paddingLeft: 10,
   },
   saveButton: {
