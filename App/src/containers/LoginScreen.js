@@ -67,14 +67,14 @@ class LoginScreen extends Component {
             loader: false,
             saving: false,
           });
-          Alert.alert("Please Login via tothenew mail id")
+          Alert.alert("Please Login via tothenew id.")
         }
       } else {
         this.setState({
           loader: false,
           saving: false,
         });
-        Alert.alert("Google Login Failed, Please try again after some time")
+        Alert.alert("Something went wrong. Please try again later!")
       }
     } catch(e) {
       Alert.alert("Something went wrong. Please try again later!");

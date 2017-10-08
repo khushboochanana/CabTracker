@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
   appName:{
     position:'absolute',
     left:50,
-    top:260,
+    top: 280,
     fontSize: 29,
     alignItems: "center",
     justifyContent: "center",

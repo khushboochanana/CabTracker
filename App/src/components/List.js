@@ -16,6 +16,7 @@ import {
 const io = require('socket.io-client');
 import get from 'lodash/get';
 import { connect } from 'react-redux';
+import call from 'react-native-phone-call'
 
 import Expo, { Permissions, Notifications } from 'expo';
 
@@ -28,7 +29,7 @@ async function registerForPushNotificationsAsync(id, token) {
     // Get the token that uniquely identifies this device
     let pushToken = await Notifications.getExpoPushTokenAsync();
     if (pushToken && id) {
-        fetch(`http://10.1.2.34:9000/user/${id}`, {
+        fetch(`http://10.1.12.33:9000/user/${id}`, {
             method: 'PUT',
             headers: {
                 Accept: 'application/json',
@@ -48,7 +49,7 @@ async function registerForPushNotificationsAsync(id, token) {
 class List extends Component {
     constructor(props) {
         super(props);
-        this.socket = io('http://10.1.2.34:9000');
+        this.socket = io('http://10.1.12.33:9000');
         this.state = {
             notification: '',
             user: get(props, 'user.user'),
@@ -163,13 +164,21 @@ class List extends Component {
     this.props.navigation.navigate("LoginScreen");
   };
 
+    calling = (phoneNumber) => {
+        const args = {
+            number: phoneNumber,
+            prompt: true
+        }
+        call(args).catch(console.error)
+    }
+
   render() {
       const { user, mates } = this.state;
       const { navigate } =  this.props.navigation;
       const currentUser = mates.find(mate => mate.id === user._id);
         return (
             <View style={{flex: 1, backgroundColor: '#fff'}}>
-              <View style={{flexDirection: 'row', justifyContent: 'flex-end', marginRight: 12}}>
+              <View style={{flexDirection: 'row', justifyContent: 'flex-end', marginRight: 12, marginTop: 60}}>
                 <TouchableHighlight
                   style={styles.logOutButton}
                   onPress={this._logOut}>
@@ -221,7 +230,7 @@ class List extends Component {
                         </View>
                     </View>
                     <View style={{flex: .7}}>
-                        <View style={{alignItems: "center", justifyContent: "center"}}>
+                        <View style={{alignItems: "center", justifyContent: "center", marginBottom: 10}}>
                             <Text style={{fontSize: 18, fontWeight: "bold"}}>Cab Mates</Text>
                         </View>
                         <FlatList
@@ -236,11 +245,11 @@ class List extends Component {
                                       style={{flex: 1}}
                                       onPress={() => navigate("Detail", { id: item && item.id })}>
                                       <View style={{flex: 1, flexDirection: "row", alignItems: 'center'}}>
-                                        <View style={{flex: 1, flexDirection: "row", alignItems: 'center'}}>
+                                        <View style={{flex: 0.8, flexDirection: "row", alignItems: 'center'}}>
                                           <View style={styles.matesImage}>
                                             <Image
                                               style={{width: 30, height: 30, borderRadius: 15}}
-                                              source={{uri: item.image ? item.image : 'http://res.cloudinary.com/hiuj1tri8/image/upload/v1507431020/blank_qprtf9.jpg'}}
+                                              source={{uri: item.image || 'http://res.cloudinary.com/hiuj1tri8/image/upload/v1507431020/blank_qprtf9.jpg'}}
                                             />
                                           </View>
                                           <View style={styles.content}>
@@ -248,7 +257,20 @@ class List extends Component {
                                             <View><Text>{item && item.emailId}</Text></View>
                                           </View>
                                         </View>
-                                        <View style={item && item.presence ? styles.circle : styles.absent} />
+                                        <View style={{flex: 0.2, flexDirection: "row",}}>
+                                          <TouchableHighlight
+                                            style={{flex: 1}}
+                                          underlayColor='transparent'
+                                          onPress={() => this.calling(item.phoneNumber)}>
+                                            <View style={{width: 20, height: 20, borderRadius: 5}}>
+                                              <Image
+                                                style={{width: 20, height: 20}}
+                                                source={{uri: 'http://res.cloudinary.com/hiuj1tri8/image/upload/v1507447627/2017-10-08_b4poao.png'}}
+                                              />
+                                            </View>
+                                          </TouchableHighlight>
+                                          <View style={item && item.presence ? styles.circle : styles.absent} />
+                                        </View>
                                       </View>
                                     </TouchableHighlight>
                                   </View>
@@ -323,8 +345,9 @@ const styles = StyleSheet.create({
     width: 15,
     height: 15,
     borderRadius: 50,
-    marginRight: 30,
+    marginRight: 20,
     backgroundColor: 'green',
+    marginTop: 3,
   },
   absent: {
     width: 13,
@@ -333,10 +356,12 @@ const styles = StyleSheet.create({
     marginRight: 30,
     borderWidth: 2,
     borderColor: '#d6d7da',
+    marginTop: 3,
   },
     base: {
         flex: .3,
         margin: 20,
+        marginBottom: 10,
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 50
@@ -425,7 +450,7 @@ const styles = StyleSheet.create({
       borderRadius: 5,
       backgroundColor: '#CD5C5C',
       width: 100,
-      marginTop: 15,
+      marginTop: 5,
       alignItems: 'center',
     }
 });
