@@ -10,6 +10,7 @@ import {
   ScrollView,
 } from "react-native"
 import { connect } from 'react-redux';
+import get from 'lodash/get';
 
 import { saveData} from '../actions/index';
 import GooglePlacesInput from './../components/Geolocation'
@@ -28,21 +29,20 @@ class UserDetailsForm extends Component {
   }
 
   componentWillMount = async () => {
-    let data
-    if (!this.props.user.user) {
-      data = JSON.parse(await AsyncStorage.getItem("auth-key"))
+    let data;
+    const user = get(this.props, 'user.user');
+    if (!user) {
+      data = JSON.parse(await AsyncStorage.getItem("auth-key"));
     } else {
-      data = this.props.user.user
+      data = user;
     }
-    this.setState({
-      data: data
-    })
-  }
+    this.setState({ data })
+  };
 
   logout = () => {
-    AsyncStorage.removeItem("auth-key")
+    AsyncStorage.removeItem("auth-key");
     this.props.navigation.navigate("LoginScreen");
-  }
+  };
 
   location = (data, details) => {
     this.setState({
@@ -51,7 +51,7 @@ class UserDetailsForm extends Component {
         latlng: details.geometry.location
       }
     })
-  }
+  };
 
   save = () => {
     const userData = {
@@ -83,38 +83,74 @@ class UserDetailsForm extends Component {
   }
 
   render () {
-    const userForm = this.state.data && this.state.data.user ? (
-      <View style={{flex: 1}}>
-        <Image
-          style={{width: 150, height: 150, borderRadius: 75}}
-          source={{uri: this.state.data.user.photoUrl}}
-        />
-        <Text>{this.state.data.user.name}</Text>
-        <Text>{this.state.data.user.email}</Text>
-        <Text>Location: </Text>
-        <GooglePlacesInput setLocation={this.location}/>
-        <View>
-          <Text>Phone number: </Text>
-          <TextInput
-            style={{height: 40, borderColor: 'gray', borderWidth: 1}}
-            onChangeText={(number) => this.setState({phoneNumber: number})}
-            value={this.state.phoneNumber}
+    const { data } = this.state;
+    const userForm = data && data.user ? (
+      <View style={styles.base}>
+        <View style={styles.logoContainer}>
+          <Image
+            style={styles.userImage}
+            source={{uri: get(data, 'user.photoUrl') || 'http://res.cloudinary.com/hiuj1tri8/image/upload/v1507431020/blank_qprtf9.jpg'}}
           />
         </View>
-        <TouchableHighlight style={styles.saveButton} onPress={this.save}>
-          <Text style={{color: "#ffffff", fontSize: 16}}>Save</Text>
-        </TouchableHighlight>
+          <View style={styles.content}>
+            <Text style={styles.userName}>{get(data, 'user.name')}</Text>
+            <Text style={styles.email}>{get(data, 'user.email')}</Text>
+            <View style={styles.geolocation}>
+              <View style={{width: 100}}>
+                <Text style={styles.location}>Location: </Text>
+              </View>
+              <GooglePlacesInput
+                setLocation={this.location}
+              />
+            </View>
+            <View style={styles.geolocation}>
+              <View style={{width: 100}}>
+                <Text
+                  style={styles.location}
+                >Phone number: </Text>
+              </View>
+              <View style={{
+                height: 45,
+                width: 255,
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderWidth: 6,
+                borderColor: '#c9c9ce'
+              }}>
+                <TextInput
+                  style={styles.textBox}
+                  onChangeText={(number) => this.setState({phoneNumber: number})}
+                  value={this.state.phoneNumber}
+                  placeholder='Enter phone number'
+                  placeholderTextColor='#a4b2b9'
+                />
+              </View>
+            </View>
+            <View style={styles.buttonView}>
+              <TouchableHighlight
+                style={[styles.logOutButton, styles.saveButton]}
+                onPress={this.save}>
+                <Text style={styles.buttonText}>
+                  Save
+                </Text>
+              </TouchableHighlight>
+            </View>
+          </View>
       </View> ) : (
       <View>
         <Text>Oops Something went wrong</Text>
       </View>
-    )
+    );
 
     return (
       <ScrollView style={styles.container}>
-        <View>
-          <TouchableHighlight style={styles.logOutButton} onPress={this.logout}>
-            <Text style={{color: "#ffffff", fontSize: 16}}>Logout</Text>
+        <View style={styles.buttonView}>
+          <TouchableHighlight
+            style={styles.logOutButton}
+            onPress={this._logOut}>
+            <Text style={styles.buttonText}>
+              Logout
+            </Text>
           </TouchableHighlight>
         </View>
         {userForm}
@@ -125,30 +161,100 @@ class UserDetailsForm extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  buttonView: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginRight: 12,
   },
   logOutButton: {
-    paddingLeft: 60,
-    paddingRight: 60,
+    padding: 10,
     borderRadius: 5,
-    paddingTop: 15,
-    paddingBottom: 15,
-    backgroundColor: '#CD5C5C'
+    backgroundColor: '#fba800',
+    width: 100,
+    marginTop: 15,
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+  },
+  base: {
+    flex:  1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  logoContainer: {
+    height: 100,
+    width: 100,
+    borderRadius: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  userImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+  },
+  content: {
+    width: '100%',
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'column',
+  },
+  userName: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 5
+  },
+  email: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 30,
+  },
+  geolocation: {
+    flex: 1,
+    justifyContent: 'space-between',
+    padding: 10,
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  location: {
+    fontSize: 18,
+    fontWeight: "700",
+  },
+  input: {
+    width: 210,
+  },
+  textBox: {
+    borderRadius: 11,
+    borderWidth: 6,
+    height: 40,
+    borderColor: '#c9c9ce',
+    width: 250,
+    paddingLeft: 10,
   },
   saveButton: {
-
-  }
-})
+    backgroundColor: '#000',
+    marginTop: 40,
+    width: 100,
+    justifyContent: 'flex-end',
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+  },
+});
 
 const mapStateToProps = (state, ownProps) => {
   return {
     user: state.user,
   }
-}
+};
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
   setDetails: (value) => dispatch(setDetails(value)),
-})
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(UserDetailsForm)
 
