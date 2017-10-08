@@ -13,7 +13,7 @@ const io = require('socket.io-client');
 export default class Map extends Component {
     constructor(props) {
         super(props);
-        this.socket = io('http://10.1.2.34:9000');
+        this.socket = io('https://hack-slash-cab.herokuapp.com/');
         this.state = {
             pickup: false,
             region: {
