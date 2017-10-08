@@ -10,7 +10,6 @@ import {
   ScrollView,
 } from "react-native";
 import Expo from 'expo';
-import get from 'lodash/get';
 
 import { getDetails, setDetails } from '../actions/index';
 
@@ -51,8 +50,8 @@ class LoginScreen extends Component {
             return response.json();
           });
           if (responseData && responseData.email) {
-            alreadyExists = responseData.email
-            this.props.setDetails(responseData)
+            alreadyExists = responseData.email;
+            this.props.setDetails(responseData);
             this.props.navigation.navigate("List");
           } else {
             this.props.navigation.navigate("UserDetailsForm");
@@ -65,7 +64,8 @@ class LoginScreen extends Component {
         Alert.alert("Google Login Failed, Please try again after some time")
       }
     } catch(e) {
-      return { error: false };
+      Alert.alert("Something went wrong. Please try again later!")
+      return { error: true };
     }
   };
 

@@ -15,12 +15,12 @@ import {
 
 const io = require('socket.io-client');
 import get from 'lodash/get';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 
-import Expo, {Permissions, Notifications} from 'expo';
+import Expo, { Permissions, Notifications } from 'expo';
 
 async function registerForPushNotificationsAsync(id, token) {
-    const {status: existingStatus} = await Permissions.getAsync(Permissions.NOTIFICATIONS);
+    const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
     if (existingStatus === 'granted' && token) return;
     const {status} = await Permissions.askAsync(Permissions.NOTIFICATIONS);
     if (status !== 'granted') return;
@@ -36,12 +36,11 @@ async function registerForPushNotificationsAsync(id, token) {
             },
             body: JSON.stringify({pushToken}),
         }).then(response => {
-            console.log("response")
             return response.json();
         }).then(data => {
-            console.log("ResponseDate >>>>>", data)
+            console.log("ResponseData", data)
         }).catch(err => {
-            console.log("Error>>>>>>>>", err);
+            console.log("Error", err);
         });
     }
 }
@@ -53,8 +52,8 @@ class List extends Component {
         this.state = {
             notification: '',
             user: get(props, 'user.user'),
-            mates: get(props, 'cab.cabMates'),
-            cab: get(props, 'cab'),
+            mates: [],
+            cab: {},
         }
     }
 
@@ -65,24 +64,25 @@ class List extends Component {
     }
 
     componentWillMount() {
-        var cabId = get(this.state, 'user.cabId');
+        let cabId = get(this.state, 'user.cabId');
         cabId = "59d90d73734d1d18c95c8ef8";
         if (cabId) {
             fetch(`http://10.1.2.34:9000/cab/${cabId}`, {
                 method: 'GET',
                 headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
+                  Accept: 'application/json',
+                  'Content-Type': 'application/json',
                 }
             }).then(response => {
                 return response.json();
-            }).then(responseData => {
-                console.log("ResponseDate >>>>>0, ", responseData);
-
-                this.setState({mates : responseData.cabMates});
-
+            }).then(data => {
+                console.log("ResponseDate comp mount, ", data);
+                this.setState({
+                  mates : data.cabMates,
+                  cab: data,
+                });
             }).catch(err => {
-                console.log(err, 'Error--')
+                console.log(err, 'Error-- comp mount')
             });
 
             this.socket.on('connect', () => {
@@ -95,8 +95,8 @@ class List extends Component {
     _handleNotification = (notification) => {
         const msg = get(notification, 'data.msg');
         if (msg) {
-            // this.props.navigation.navigate("Detail", {id : parseInt(notification.data.id)});
-            Alert.alert('Notification : ' + msg);
+          // this.props.navigation.navigate("Detail", {id : parseInt(notification.data.id)});
+          Alert.alert('Notification : ' + msg);
         }
     };
 
@@ -152,14 +152,14 @@ class List extends Component {
     };
 
     _gotoMap = () => {
-        this.props.navigation.navigate("Map", {mates : this.state.mates});
+        this.props.navigation.navigate("Map", { mates : this.state.mates });
     };
 
     _keyExtractor = (item, index) => index;
 
     logout = () => {
-        AsyncStorage.removeItem("auth-key");
-        this.props.navigation.navigate("LoginScreen");
+      AsyncStorage.removeItem("auth-key");
+      this.props.navigation.navigate("LoginScreen");
     };
 
   render() {
@@ -210,27 +210,29 @@ class List extends Component {
                         </View>
 
                         <View style={{flex: .7}}>
-                            <View style={{padding: 5, alignItems: "center", justifyContent: "center"}}>
+                            <View style={{alignItems: "center", justifyContent: "center"}}>
                                 <Text style={{fontSize: 18, fontWeight: "bold"}}>Cab Mates</Text>
                             </View>
                             <FlatList
                                 data={mates}
                                 keyExtractor={this._keyExtractor}
-                                renderItem={({item, index}) => <View style={{borderBottomWidth: 1, borderColor: "#ddd"}}
-                                                                     key={index}>
-                                    <TouchableHighlight style={{flex: 1}}
-                                                        onPress={() => navigate("Detail", {id: item && item.id})}>
-                                        <View style={{flex: 1, flexDirection: "row"}}>
-                                            <View style={{flex: .7, flexWrap: 'wrap'}}>
-                                                <View style={styles.content}>
-                                                    <View><Text style={styles.title}>{item && item.name}</Text></View>
-                                                    <View><Text>{item && item.emailId}</Text></View>
-                                                    <view style={{height: 10, width: 10,backgroundColor: 'green'}}></view>
-                                                </View>
-                                            </View>
-                                        </View>
-                                    </TouchableHighlight>
-                                </View>}
+                                renderItem={({item, index}) => {
+                                    return (
+                                      <View style={{borderBottomWidth: 1, borderColor: "#ddd"}} key={index}>
+                                          <TouchableHighlight
+                                            style={{flex: 1}}
+                                            onPress={() => navigate("Detail", { id: item && item.id })}>
+                                              <View style={{flex: 1, flexDirection: "row", justifyContent: 'space-between', alignItems: 'center'}}>
+                                                  <View style={styles.content}>
+                                                      <View><Text style={styles.title}>{item && item.name}</Text></View>
+                                                      <View><Text>{item && item.emailId}</Text></View>
+                                                  </View>
+                                                  <View style={item && item.presence ? styles.circle : styles.absent} />
+                                              </View>
+                                          </TouchableHighlight>
+                                      </View>
+                                    )
+                                }}
                             />
                         </View>
                     </View>
@@ -295,6 +297,21 @@ class List extends Component {
 }
 
 const styles = StyleSheet.create({
+  circle: {
+    width: 15,
+    height: 15,
+    borderRadius: 50,
+    marginRight: 30,
+    backgroundColor: 'green',
+  },
+  absent: {
+    width: 13,
+    height: 13,
+    borderRadius: 50,
+    marginRight: 30,
+    borderWidth: 2,
+    borderColor: '#d6d7da',
+  },
     base: {
         flex: .3,
         margin: 20,
@@ -386,14 +403,14 @@ const styles = StyleSheet.create({
       position: 'absolute',
       right: 10,
       top: 0,
+      zIndex: 999,
     }
 });
-
 
 const mapStateToProps = (state) => {
     return {
         user: state.user,
     }
-}
+};
 
 export default connect(mapStateToProps)(List)
