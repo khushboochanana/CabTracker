@@ -67,6 +67,7 @@ const updateRoster = (req, res) => {
       updatedObj.cabMates = cabMates;
     }
     Cab.update({ _id: id }, { $set: updatedObj }, (err, cab) => {
+      console.log("update cab", cab)
       if (err) return res.status(401).json(err);
       if (!cab) return res.status(404).send("Not found");
       return res.status(201).json(cab);

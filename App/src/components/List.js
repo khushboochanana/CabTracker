@@ -134,12 +134,12 @@ class List extends Component {
             fetch(`http://10.1.2.34:9000/cab/${cabId}`, {
                 method: 'PUT',
                 headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
+                  Accept: 'application/json',
+                  'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    presence: value,
-                    userId,
+                  presence: value,
+                  userId,
                 }),
             }).then(response => {
                 return response.json();
@@ -164,6 +164,8 @@ class List extends Component {
 
   render() {
       const { user, mates } = this.state;
+      const { navigate } =  this.props.navigation;
+      const currentUser = mates.find(mate => mate.id === user._id);
         return (
             <View style={{flex: 1, backgroundColor: '#fff'}}>
               <View>
@@ -188,7 +190,7 @@ class List extends Component {
                             <Text style={styles.userName}>{user && user.name}</Text>
                             <Text style={{fontSize: 18, fontWeight: "bold"}}>{user && user.email}</Text>
                           <View style={{flex: .3, alignItems: 'center', justifyContent: 'center', marginTop: 10}}>
-                            <Switch accessible={false} value={user && user.presence} onValueChange={(value) => { this._markAbsent(value); }}></Switch>
+                            <Switch value={currentUser && currentUser.presence} onValueChange={(value) => { this._markAbsent(value); }}></Switch>
                           </View>
                             <View style={{
                                 flex: 1,
