@@ -16,6 +16,7 @@ import {
 const io = require('socket.io-client');
 import get from 'lodash/get';
 import { connect } from 'react-redux';
+import call from 'react-native-phone-call'
 
 import Expo, { Permissions, Notifications } from 'expo';
 
@@ -28,7 +29,7 @@ async function registerForPushNotificationsAsync(id, token) {
     // Get the token that uniquely identifies this device
     let pushToken = await Notifications.getExpoPushTokenAsync();
     if (pushToken && id) {
-        fetch(`http://10.1.2.34:9000/user/${id}`, {
+        fetch(`http://10.1.20.149/user/${id}`, {
             method: 'PUT',
             headers: {
                 Accept: 'application/json',
@@ -48,7 +49,7 @@ async function registerForPushNotificationsAsync(id, token) {
 class List extends Component {
     constructor(props) {
         super(props);
-        this.socket = io('http://10.1.2.34:9000');
+        this.socket = io('http://10.1.20.149:9000');
         this.state = {
             notification: '',
             user: get(props, 'user.user'),
@@ -67,7 +68,7 @@ class List extends Component {
         let cabId = get(this.state, 'user.cabId');
         cabId = "59d90d73734d1d18c95c8ef8";
         if (cabId) {
-            fetch(`http://10.1.12.33:9000/cab/${cabId}`, {
+            fetch(`http://10.1.20.149:9000/cab/${cabId}`, {
                 method: 'GET',
                 headers: {
                   Accept: 'application/json',
@@ -103,7 +104,7 @@ class List extends Component {
     _pickUp = () => {
         const { cabId, location } = get(this.state, 'user');
         if (cabId && location) {
-            fetch(`http://10.1.12.33:9000/user/${cabId}/notification`, {
+            fetch(`http://10.1.20.149:9000/user/${cabId}/notification`, {
                 method: 'POST',
                 headers: {
                     Accept: 'application/json',
@@ -131,7 +132,7 @@ class List extends Component {
         const userId = get(this.state, 'user._id');
         const cabId = get(this.state, 'cab.cabId');
         if (userId && cabId) {
-            fetch(`http://10.1.12.33:9000/cab/${cabId}`, {
+            fetch(`http://10.1.20.149:9000/cab/${cabId}`, {
                 method: 'PUT',
                 headers: {
                   Accept: 'application/json',
@@ -161,6 +162,14 @@ class List extends Component {
     AsyncStorage.removeItem("auth-key");
     this.props.navigation.navigate("LoginScreen");
   };
+
+    calling = (phoneNumber) => {
+        const args = {
+            number: phoneNumber,
+            prompt: true
+        }
+        call(args).catch(console.error)
+    }
 
   render() {
       const { user, mates } = this.state;
@@ -248,6 +257,13 @@ class List extends Component {
                                           </View>
                                         </View>
                                         <View style={item && item.presence ? styles.circle : styles.absent} />
+                                      <TouchableHighlight
+                                          style={{flex: 1}}
+                                          onPress={() => this.calling(item.phoneNumber)}>
+                                          <View>
+                                            <Text>Call</Text>
+                                          </View>
+                                      </TouchableHighlight>
                                       </View>
                                     </TouchableHighlight>
                                   </View>
