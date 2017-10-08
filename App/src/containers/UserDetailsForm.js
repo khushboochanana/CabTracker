@@ -132,6 +132,7 @@ class UserDetailsForm extends Component {
                   value={this.state.phoneNumber}
                   placeholder='Enter phone number'
                   placeholderTextColor='#a4b2b9'
+                  keyboardType='numeric'
                 />
               </View>
             </View>
