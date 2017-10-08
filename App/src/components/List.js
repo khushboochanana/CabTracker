@@ -259,7 +259,8 @@ class List extends Component {
                                         <View style={{flex: 0.2, flexDirection: "row",}}>
                                           <TouchableHighlight
                                             style={{flex: 1}}
-                                            onPress={() => this.calling(item.phoneNumber)}>
+                                          underlayColor='transparent'
+                                          onPress={() => this.calling(item.phoneNumber)}>
                                             <View style={{width: 20, height: 20, borderRadius: 5}}>
                                               <Image
                                                 style={{width: 20, height: 20}}
