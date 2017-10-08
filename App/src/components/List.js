@@ -16,6 +16,7 @@ import {
 const io = require('socket.io-client');
 import get from 'lodash/get';
 import { connect } from 'react-redux';
+import call from 'react-native-phone-call'
 
 import Expo, { Permissions, Notifications } from 'expo';
 
@@ -28,7 +29,7 @@ async function registerForPushNotificationsAsync(id, token) {
     // Get the token that uniquely identifies this device
     let pushToken = await Notifications.getExpoPushTokenAsync();
     if (pushToken && id) {
-        fetch(`http://10.1.2.34:9000/user/${id}`, {
+        fetch(`http://10.1.12.33:9000/user/${id}`, {
             method: 'PUT',
             headers: {
                 Accept: 'application/json',
@@ -48,7 +49,7 @@ async function registerForPushNotificationsAsync(id, token) {
 class List extends Component {
     constructor(props) {
         super(props);
-        this.socket = io('http://10.1.2.34:9000');
+        this.socket = io('http://10.1.12.33:9000');
         this.state = {
             notification: '',
             user: get(props, 'user.user'),
@@ -162,6 +163,14 @@ class List extends Component {
     this.props.navigation.navigate("LoginScreen");
   };
 
+    calling = (phoneNumber) => {
+        const args = {
+            number: phoneNumber,
+            prompt: true
+        }
+        call(args).catch(console.error)
+    }
+
   render() {
       const { user, mates } = this.state;
       const { navigate } =  this.props.navigation;
@@ -248,6 +257,13 @@ class List extends Component {
                                           </View>
                                         </View>
                                         <View style={item && item.presence ? styles.circle : styles.absent} />
+                                      <TouchableHighlight
+                                          style={{flex: 1}}
+                                          onPress={() => this.calling(item.phoneNumber)}>
+                                          <View>
+                                            <Text>Call</Text>
+                                          </View>
+                                      </TouchableHighlight>
                                       </View>
                                     </TouchableHighlight>
                                   </View>
@@ -424,7 +440,7 @@ const styles = StyleSheet.create({
       borderRadius: 5,
       backgroundColor: '#CD5C5C',
       width: 100,
-      marginTop: 15,
+      marginTop: 5,
       alignItems: 'center',
     }
 });
