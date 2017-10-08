@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: '#fba800',
     width: 100,
-    marginTop: 15,
+    marginTop: 5,
     alignItems: 'center',
     justifyContent: 'flex-end',
   },
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     backgroundColor: '#000',
-    marginTop: 40,
+    marginTop: 20,
     width: 100,
     justifyContent: 'flex-end',
   },

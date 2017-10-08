@@ -16,15 +16,9 @@ const stackNav = {
   },
   List : {
     screen : List,
-    navigationOptions : {
-      title : "Detail"
-    }
   },
   UserDetailsForm : {
     screen : UserDetailsForm,
-    navigationOptions : {
-      title : "Select Items"
-    }
   },
   Map : {
     screen : Map

@@ -424,7 +424,7 @@ const styles = StyleSheet.create({
       borderRadius: 5,
       backgroundColor: '#CD5C5C',
       width: 100,
-      marginTop: 15,
+      marginTop: 5,
       alignItems: 'center',
     }
 });
