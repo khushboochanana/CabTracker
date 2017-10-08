@@ -1,5 +1,8 @@
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
@@ -11,12 +14,9 @@ var UserSchema = new Schema({
     pushToken: String,
     location: Object,
     cabId: String,
-    image: {
-        title: String,
-        publicId: String
-    },
+    image: String,
     phoneNumber: String
 });
 
 var User = mongoose.model('User', UserSchema);
-module.exports = User;
+exports.default = User;

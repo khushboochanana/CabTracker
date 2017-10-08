@@ -13,10 +13,7 @@ var CabSchema = new Schema({
         id: String,
         name: String,
         emailId: String,
-        image: {
-          title: String,
-          publicId: String,  
-        },
+        image: String,
         location: Object,
         presence: { type: Boolean, default: true },
         phoneNumber: String,

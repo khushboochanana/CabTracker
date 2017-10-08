@@ -9,13 +9,10 @@ var UserSchema = new Schema({
     googleId: String,
     pushToken: String,
     location: Object,
-    cabId: String,
-    image: {
-        title: String,
-        publicId: String,
-    },
+    cabId:String,
+    image: String,
     phoneNumber: String,
 });
 
-const User = mongoose.model('user', UserSchema);
+const User = mongoose.model('User', UserSchema);
 export default User;
