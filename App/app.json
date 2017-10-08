@@ -1,5 +1,15 @@
 {
   "expo": {
-    "sdkVersion": "20.0.0"
+    "name": "TTNcABtracKeR",
+    "sdkVersion": "20.0.0",
+    "icon": "http://res.cloudinary.com/hiuj1tri8/image/upload/v1507387195/cab_snwgzs.png",
+    "version": "1.0.0",
+    "slug": "your-app-slug",
+    "ios": {
+      "bundleIdentifier": "com.ttn.TTNcABtracKeR"
+    },
+    "android": {
+      "package": "com.ttn.TTNcABtracKeR"
+    }
   }
 }

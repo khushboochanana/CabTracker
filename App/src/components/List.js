@@ -49,12 +49,14 @@ async function registerForPushNotificationsAsync(id, token) {
 class List extends Component {
     constructor(props) {
         super(props);
+        console.log(props,">?>?>?>")
         this.socket = io('https://hack-slash-cab.herokuapp.com');
         this.state = {
             notification: '',
             user: get(props, 'user.user'),
             mates: [],
             cab: {},
+            status:false
         }
     }
 
@@ -66,7 +68,6 @@ class List extends Component {
 
     componentWillMount() {
         let cabId = get(this.state, 'user.cabId');
-        cabId = "59d90d73734d1d18c95c8ef8";
         if (cabId) {
             fetch(`https://hack-slash-cab.herokuapp.com/cab/${cabId}`, {
                 method: 'GET',
@@ -78,9 +79,11 @@ class List extends Component {
                 return response.json();
             }).then(data => {
                 console.log("ResponseDate comp mount, ", data);
+                const currentUser=data.cabMates.find(mate => mate.id === this.state.user._id)
                 this.setState({
-                  mates : data.cabMates,
-                  cab: data,
+                    mates: data.cabMates,
+                    cab: data,
+                    status: currentUser.presence
                 });
             }).catch(err => {
                 console.log(err, 'Error-- comp mount')
@@ -130,10 +133,12 @@ class List extends Component {
     };
 
     _markAbsent = (value) => {
+        console.log(value);
         const userId = get(this.state, 'user._id');
-        const cabId = get(this.state, 'cab.cabId');
+        const cabId = get(this.state, 'user.cabId');
         if (userId && cabId) {
-            fetch(`https://hack-slash-cab.herokuapp.com/cab/${cabId}`, {
+            console.log("Insideeeeeeeeeeeeeeeeeeeeeee")
+            fetch(`http://10.1.20.149:9000/cab/${cabId}`, {
                 method: 'PUT',
                 headers: {
                   Accept: 'application/json',
@@ -147,6 +152,9 @@ class List extends Component {
                 return response.json();
             }).then(data => {
                 console.log("ResponseDate >>>>>0, ", data)
+                this.setState({
+                    status:value
+                });
             }).catch(err => {
                 console.log(err, 'Error--')
             });
@@ -173,8 +181,9 @@ class List extends Component {
     }
 
   render() {
-      const { user, mates } = this.state;
+      const { user, mates,status } = this.state;
       const { navigate } =  this.props.navigation;
+      console.log(mates,">???")
       const currentUser = mates.find(mate => mate.id === user._id);
         return (
             <View style={{flex: 1, backgroundColor: '#fff'}}>
@@ -203,8 +212,8 @@ class List extends Component {
                       <View
                         style={{flex: .3, alignItems: 'center', justifyContent: 'center', marginTop: 10}}>
                         <Switch
-                          value={currentUser && currentUser.presence}
-                          onValueChange={(value) => { this._markAbsent(value); }}>
+                          value={status}
+                          onValueChange={(value) => { console.log("inside mark", value); this._markAbsent(value); }}>
                         </Switch>
                       </View>
                         <View style={{

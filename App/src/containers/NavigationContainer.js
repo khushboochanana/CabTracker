@@ -33,10 +33,7 @@ const stackNav = {
     }
   },
   Map : {
-    screen : Map,
-    navigationOptions : {
-      header: null
-    }
+    screen : Map
   }
 }
 

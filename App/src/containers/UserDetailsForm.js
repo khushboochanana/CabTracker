@@ -82,9 +82,12 @@ class UserDetailsForm extends Component {
       }).then((response)=>{
         return response.json();
       }).then((responseData) => {
+        console.log(responseData,"?>??>")
         AsyncStorage.setItem("auth-key", JSON.stringify(responseData));
         this.props.setDetails(responseData)
         this.props.navigation.navigate("List");
+      }).catch((err)=>{
+        Alert.alert('Something went wrong. Please try again later!')
       });
     } else {
       this.setState({ error: 'Both fields are required.'});
