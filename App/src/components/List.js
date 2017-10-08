@@ -183,8 +183,8 @@ class List extends Component {
                       <View style={styles.logo}>
                           <View style={styles.logoContainer}>
                               <Image
-                                style={{width: 100, height: 100, borderRadius: 75}}
-                                source={{uri: user.image}}
+                                style={{width: 100, height: 100, borderRadius: 50}}
+                                source={{uri: user.image ? user.image : 'http://res.cloudinary.com/hiuj1tri8/image/upload/v1507431020/blank_qprtf9.jpg'}}
                               />
                           </View>
                       </View>
@@ -227,21 +227,32 @@ class List extends Component {
                             data={mates}
                             keyExtractor={this._keyExtractor}
                             renderItem={({item, index}) => {
+                              if (item.id === user._id) return null;
+                              else {
                                 return (
                                   <View style={{borderBottomWidth: 1, borderColor: "#ddd"}} key={index}>
-                                      <TouchableHighlight
-                                        style={{flex: 1}}
-                                        onPress={() => navigate("Detail", { id: item && item.id })}>
-                                          <View style={{flex: 1, flexDirection: "row", justifyContent: 'space-between', alignItems: 'center'}}>
-                                              <View style={styles.content}>
-                                                  <View><Text style={styles.title}>{item && item.name}</Text></View>
-                                                  <View><Text>{item && item.emailId}</Text></View>
-                                              </View>
-                                              <View style={item && item.presence ? styles.circle : styles.absent} />
+                                    <TouchableHighlight
+                                      style={{flex: 1}}
+                                      onPress={() => navigate("Detail", { id: item && item.id })}>
+                                      <View style={{flex: 1, flexDirection: "row", alignItems: 'center'}}>
+                                        <View style={{flex: 1, flexDirection: "row", alignItems: 'center'}}>
+                                          <View style={styles.matesImage}>
+                                            <Image
+                                              style={{width: 30, height: 30, borderRadius: 15}}
+                                              source={{uri: item.image ? item.image : 'http://res.cloudinary.com/hiuj1tri8/image/upload/v1507431020/blank_qprtf9.jpg'}}
+                                            />
                                           </View>
-                                      </TouchableHighlight>
+                                          <View style={styles.content}>
+                                            <View><Text style={styles.title}>{item && item.name}</Text></View>
+                                            <View><Text>{item && item.emailId}</Text></View>
+                                          </View>
+                                        </View>
+                                        <View style={item && item.presence ? styles.circle : styles.absent} />
+                                      </View>
+                                    </TouchableHighlight>
                                   </View>
                                 )
+                              }
                             }}
                         />
                     </View>
@@ -332,16 +343,23 @@ const styles = StyleSheet.create({
     logoContainer: {
         height: 100,
         width: 100,
-        borderRadius: 60,
+        borderRadius: 50,
         backgroundColor: 'grey'
     },
+  matesImage: {
+    height: 30,
+    width: 30,
+    borderRadius: 15,
+    backgroundColor: 'grey',
+    marginLeft: 20,
+  },
     logo: {
-        flex: 0.5,
-        alignItems: 'center',
-        justifyContent: 'flex-end',
-        marginBottom: 10,
-        marginTop: -20,
-    },
+      flex: 0.5,
+      alignItems: 'center',
+      justifyContent: 'flex-end',
+      marginBottom: 10,
+      marginTop: -20,
+  },
     container: {
         flex: 1
     },
