@@ -9,28 +9,34 @@ import SplashScreen from "./SplashScreen"
 
 const stackNav = {
   Splash : {
-    screen : SplashScreen
+    screen : SplashScreen,
+    navigationOptions : {
+      header: null
+    }
   },
   LoginScreen : {
     screen : LoginScreen,
     navigationOptions : {
-      headerLeft: null
+      header: null
     }
   },
   List : {
     screen : List,
     navigationOptions : {
-      headerLeft: null
+      header: null
     }
   },
   UserDetailsForm : {
     screen : UserDetailsForm,
     navigationOptions : {
-      headerLeft: null
+      header: null
     }
   },
   Map : {
-    screen : Map
+    screen : Map,
+    navigationOptions : {
+      header: null
+    }
   }
 }
 

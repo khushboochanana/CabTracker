@@ -340,6 +340,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     marginRight: 30,
     backgroundColor: 'green',
+    marginTop: 3,
   },
   absent: {
     width: 13,
@@ -348,6 +349,7 @@ const styles = StyleSheet.create({
     marginRight: 30,
     borderWidth: 2,
     borderColor: '#d6d7da',
+    marginTop: 3,
   },
     base: {
         flex: .3,
