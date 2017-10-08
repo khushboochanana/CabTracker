@@ -184,7 +184,7 @@ class List extends Component {
                           <View style={styles.logoContainer}>
                               <Image
                                 style={{width: 100, height: 100, borderRadius: 75}}
-                                source={{uri: 'https://facebook.github.io/react/img/logo_og.png'}}
+                                source={{uri: user.image}}
                               />
                           </View>
                       </View>
@@ -340,6 +340,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'flex-end',
         marginBottom: 10,
+        marginTop: -20,
     },
     container: {
         flex: 1
